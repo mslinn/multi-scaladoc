@@ -4,7 +4,7 @@ function help {
   echo "This script generates Scaladoc for this project's subprojects.
 SBT and git must be installed for this script to work, and the generated Scaladoc will look better if graphviz is installed.
 To see the help information for this program, type:
-    bin/doc
+    bin/run
 "
   exit
 }

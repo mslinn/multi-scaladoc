@@ -49,13 +49,13 @@ The following directory structure is temporarily created while the program runs.
 The documentation for this project is generated separately for each subproject.
 For usage, simply type:
 ```
-$ bin/doc
+$ bin/run
 Scaladoc publisher for multi-project SBT builds 0.1.0
-Usage: bin/doc [options]
+Usage: bin/run [options]
 
   -c, --copyright <value>  Scaladoc footer
-  -d, --deleteAfterUse <value>
-                           Remove the GhPages temporary directory when the program ends
+  -k, --keepAfterUse <value>
+                           Keep the GhPages temporary directory when the program ends
   -n, --gitHubName <value>
                            Github project ID for project to be documented
   -o, --overWriteIndex <value>
