@@ -5,11 +5,11 @@ import scopt.OptionParser
 
 trait OptionParsing {
   val parser: OptionParser[Config] = new scopt.OptionParser[Config]("bin/doc") {
-    head("ScaladcoPublisher", BuildInfo.version)
+    head("Scaladoc publisher for multi-project SBT builds", BuildInfo.version)
 
     opt[Boolean]('a', "autoCheckIn").action { (value, config) =>
       config.copy(autoCheckIn = value)
-    }.text("Stop program if any files need to be committed or pushed")
+    }.text("Stop program if this flag is not specified and any files need to be committed or pushed")
 
     opt[String]('c', "copyright").action { (value, config) =>
       config.copy(copyright = value)
@@ -17,11 +17,11 @@ trait OptionParsing {
 
     opt[Boolean]('d', "deleteAfterUse").action { (value, config) =>
       config.copy(deleteAfterUse = value)
-    }.text("remove the GhPages temporary directory when the program ends")
+    }.text("Remove the GhPages temporary directory when the program ends")
 
     opt[String]('n', "gitHubName").action { (value, config) =>
       config.copy(gitHubName = value)
-    }.required.text("Github ID for project")
+    }.required.text("Github project ID for project to be documented")
 
     opt[Boolean]('o', "overWriteIndex").action { (value, config) =>
       config.copy(overWriteIndex = value)
@@ -33,6 +33,6 @@ trait OptionParsing {
 
     opt[String]('s', "subProjectNames").action { (value, config) =>
       config.copy(subProjectNames = value.split(",").toList)
-    }.text(s"Comma-delimited names of subprojects to generate Scaladoc for")
+    }.required.text(s"Comma-delimited names of subprojects to generate Scaladoc for")
   }
 }

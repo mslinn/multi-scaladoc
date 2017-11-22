@@ -1,9 +1,12 @@
-bintrayOrganization := Some("micronautics")
+enablePlugins(BuildInfoPlugin)
 
-bintrayRepository := "scala"
+buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion)
 
-bintrayPackage := name.value
+buildInfoPackage := "buildInfo"
 
+buildInfoKeys ++= Seq[BuildInfoKey]( // assumes that the git repo directory has not been renamed
+  "gitRepoName" -> new File(sys.props("user.dir")).getName
+)
 cancelable := true
 
 // See https://stackoverflow.com/a/27858890/553865
@@ -27,10 +30,12 @@ javacOptions ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "ch.qos.logback"         %  "logback-classic"       % "1.2.3",
+  "commons-io"       %  "commons-io"      % "2.6"   withSources(),
+  "com.github.scopt" %% "scopt"           % "3.7.0" withSources(),
+  "ch.qos.logback"   %  "logback-classic" % "1.2.3",
   //
-  "org.scalatest"          %% "scalatest"   % "3.0.3" % Test withSources(),
-  "junit"                  %  "junit"       % "4.12"  % Test
+  "org.scalatest"    %% "scalatest"       % "3.0.3" % Test withSources(),
+  "junit"            %  "junit"           % "4.12"  % Test
 )
 
 licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html"))

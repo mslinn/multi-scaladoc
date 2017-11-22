@@ -1,11 +1,11 @@
 package com.micronautics.publish
 
 import java.io.File
+import buildInfo.BuildInfo
 import org.slf4j.Logger
 
-/** Utility for creating combined Scaladoc for an SBT multi-project.
-  * Must be run from top-level git repo directory */
-object Publish extends App with OptionParsing {
+/** Utility for creating combined Scaladoc for an SBT multi-project */
+object Main extends App with OptionParsing {
   parser.parse(args, Config.default) match {
      case Some(config) => doIt(config)
 
