@@ -10,5 +10,5 @@ To see the help information for this program, type:
 }
 
 COPYRIGHT='Copyright 2017 Micronautics Research Corporation. All rights reserved.'
-ENTRY_POINT="com.micronautics.publish.Publish"
+ENTRY_POINT="com.micronautics.publish.Main"
 sbt "; project publish; runMain $ENTRY_POINT --gitHubName mslinn --copyright \"$COPYRIGHT\""
