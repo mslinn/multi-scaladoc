@@ -24,7 +24,7 @@ The documentation for this project is generated separately for each subprojects.
 For usage, simply type:
 ```
 $ bin/doc
-Publish 0.2.1
+Publish 0.1.0
 Usage: bin/doc [options]
 
   -a, --autoCheckIn <value>
