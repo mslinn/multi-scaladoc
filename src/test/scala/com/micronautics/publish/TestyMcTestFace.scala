@@ -79,18 +79,18 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
   "GhPages branch creation" should {
     "work" ignore { // todo currently tests with a live project, need a dummy project for testing
       val root: Path = Files.createTempDirectory("ghPages")
-      val repoDir = new File(root.toFile, "repo")
+      val ghPagesDir = new File(root.toFile, "ghPages")
       val ghPagesBranchName = "gh-pages"
       config.gitRemoteOriginUrl.foreach { url =>
-        commandLine.run(root, "git", "clone", url, repoDir.getName) // todo try "--depth", "1",
+        commandLine.run(root, "git", "clone", url, ghPagesDir.getName) // todo try "--depth", "1",
       }
-      commandLine.run(repoDir, "git", "checkout", "--orphan", ghPagesBranchName)
-      Nuke.removeUnderExceptGit(repoDir)
-      assert(repoDir.toPath.resolve(".git").toFile.exists, ".git directory got clobbered")
-      repoDir.list.length shouldBe 1
+      commandLine.run(ghPagesDir, "git", "checkout", "--orphan", ghPagesBranchName)
+      Nuke.removeUnderExceptGit(ghPagesDir)
+      assert(ghPagesDir.toPath.resolve(".git").toFile.exists, ".git directory got clobbered")
+      ghPagesDir.list.length shouldBe 1
 
       // Establish the branch existence
-      commandLine.run(repoDir, "git", "commit", "--allow-empty", "-m", s"Initialized $ghPagesBranchName branch")
+      commandLine.run(ghPagesDir, "git", "commit", "--allow-empty", "-m", s"Initialized $ghPagesBranchName branch")
       //commandLine.run(repoDir, "git", "push", "origin", ghPagesBranchName) // this is a live test, don't want to affect the git project
       Nuke.remove(root)
     }

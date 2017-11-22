@@ -75,7 +75,7 @@ class Documenter(val subProjects: List[SubProject])
     }
   }
 
-  protected[publish] def gitPull(): Unit =
+  @inline protected[publish] def gitPull(): Unit =
     run("git pull")(LogMessage(INFO, "Fetching latest updates for this git repo"), log)
 
   protected[publish] def gitAddCommitPush(message: LogMessage = LogMessage.empty)
@@ -134,7 +134,7 @@ class Documenter(val subProjects: List[SubProject])
     * 5) Commits the branch */
   protected[publish] def setup()(implicit project: Project, subProject: SubProject): Unit = {
     try {
-      ghPages.checkoutOrClone(gitWorkPath)
+      ghPages.clone(gitWorkPath)
       if (ghPages.ghPagesBranchExists) ghPages.deleteScaladoc()
       else ghPages.createGhPagesBranch()
       gitAddCommitPush()

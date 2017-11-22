@@ -67,12 +67,12 @@ class CommandLine(implicit config: Config = Config.default) {
   }
 
 
-  def run(cwd: Path, cmd: String)
+  @inline def run(cwd: Path, cmd: String)
          (implicit logMessage: LogMessage, log: Logger): String =
     run(cwd.toFile, cmd)
 
 
-  def run(cwd: Path, cmd: String*)
+  @inline def run(cwd: Path, cmd: String*)
          (implicit logMessage: LogMessage, log: Logger): String =
     run(cwd.toFile, cmd: _*)
 

@@ -7,7 +7,7 @@
 This program creates Scaladoc for SBT multi-projects hosted on GitHub.
 You must have write access to the GitHub project being documented.
 Following is a high-level description of what this program does for the GitHub project that you specify.
-The system's temporary directory is used for all steps.
+The system's temporary directory is used for all steps; this is often `/tmp`.
 1. If the `gh-pages` branch exists, any existing Scaladoc for SBT subprojects is deleted, otherwise the `gh-pages` branch is created.
 2. The `master` branch is checked out.
 3. Scaladoc is built from the `master` branch source, 

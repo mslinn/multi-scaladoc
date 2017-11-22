@@ -33,6 +33,9 @@ object Nuke {
   @inline def removeUnder(file: File)
                  (implicit log: Logger): Unit = remove(file.toPath, deleteRoot=false)
 
+  @inline def removeUnder(path: Path)
+                 (implicit log: Logger): Unit = remove(path, deleteRoot=false)
+
   @inline def removeUnderExceptGit(file: File)
                                   (implicit log: Logger): Unit =
     file
