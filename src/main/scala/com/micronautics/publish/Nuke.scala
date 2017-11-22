@@ -12,15 +12,13 @@ object Nuke {
   @inline def remove(root: Path, deleteRoot: Boolean = true)
             (implicit log: Logger): Unit =
     if (root.exists) {
-      log.debug(
-        if (deleteRoot) {
-          FileUtils.forceDelete(root)
-          s"Nuking $root"
-        } else {
-          FileUtils.cleanDirectory(root)
-          s"Clearing files and directories under $root (${ root.list.mkString(", ") })"
-        }
-      )
+      if (deleteRoot) {
+        log.debug(s"Nuking $root")
+        FileUtils.forceDelete(root)
+      } else {
+        log.debug(s"Clearing files and directories under $root (${ root.list.mkString(", ") })")
+        FileUtils.cleanDirectory(root)
+      }
     }
 
   @inline def remove(string: String)

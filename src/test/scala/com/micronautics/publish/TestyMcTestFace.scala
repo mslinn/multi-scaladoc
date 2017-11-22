@@ -77,7 +77,7 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
   }
 
   "GhPages branch creation" should {
-    "work" in {
+    "work" ignore {
       // todo currently testing with a live project, need to create a dummy project for testing
       val root: Path = Files.createTempDirectory("ghPages")
       val repoDir = new File(root.toFile, "repo")
@@ -107,7 +107,7 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
   }
 
   "RunScaladoc" should {
-    "work" in {
+    "work" ignore {
       subProjects.foreach(documenter.runScaladoc)
 
       ghPages.root.resolve("latest/api/demo").toFile.listFiles.length must be > 0
