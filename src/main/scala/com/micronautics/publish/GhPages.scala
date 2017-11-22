@@ -14,7 +14,7 @@ object GhPages {
   * @param root directory to place the contents of GhPages */
 case class GhPages(
   deleteAfterUse: Boolean = true,
-  root: Path = Files.createTempDirectory("ghPages")
+  root: Path = Files.createTempDirectory("ghPages").toAbsolutePath
 )(implicit config: Config, log: Logger) {
   import GhPages._
 

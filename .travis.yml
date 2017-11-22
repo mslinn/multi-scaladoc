@@ -30,4 +30,4 @@ before_script:
   - mkdir tmp
 
 script:
-  - sbt -no-colors -Djava.io.tmpdir=tmp ++$TRAVIS_SCALA_VERSION test
+  - sbt -Djava.io.tmpdir=tmp ++$TRAVIS_SCALA_VERSION test

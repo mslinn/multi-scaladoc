@@ -10,15 +10,18 @@ object Nuke {
 
   /** Adapted from https://stackoverflow.com/a/45703150/553865 */
   @inline def remove(root: Path, deleteRoot: Boolean = true)
-            (implicit log: Logger): Unit = {
-    log.debug(
-      if (deleteRoot) s"Nuking $root"
-      else s"Clearing files and directories under $root (${ root.list.mkString(", ") })"
-    )
-
-    if (deleteRoot) FileUtils.forceDelete(root)
-    else FileUtils.cleanDirectory(root)
-  }
+            (implicit log: Logger): Unit =
+    if (root.exists) {
+      log.debug(
+        if (deleteRoot) {
+          FileUtils.forceDelete(root)
+          s"Nuking $root"
+        } else {
+          FileUtils.cleanDirectory(root)
+          s"Clearing files and directories under $root (${ root.list.mkString(", ") })"
+        }
+      )
+    }
 
   @inline def remove(string: String)
                (implicit log: Logger): Unit = remove(Paths.get(string))
