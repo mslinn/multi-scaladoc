@@ -58,9 +58,11 @@ Usage: bin/run [options]
                            Keep the GhPages temporary directory when the program ends
   -n, --gitHubName <value>
                            Github project ID for project to be documented
-  -o, --overWriteIndex <value>
-                           Do not preserve any pre-existing index.html in the Scaladoc root
-  -r, --dryRun <value>     Stubs out 'git commit' and displays the command line that would be run instead, along with the output of 'git status'
+  -p, --preserveIndex <value>
+                           Preserve any pre-existing index.html in the Scaladoc root; if this option is not specified, 
+                           the file is regenerated each time this program runs
+  -r, --dryRun <value>     Stubs out 'git commit' and displays the command line that would be run instead, 
+                           along with the output of 'git status'
   -s, --subProjectNames <value>
                            Comma-delimited names of subprojects to generate Scaladoc for
   -u, --gitRemoteOriginUrl <value>

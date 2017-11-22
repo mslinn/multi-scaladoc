@@ -27,9 +27,9 @@ trait OptionParsing {
       config.copy(keepAfterUse = value)
     }.text("Keep the GhPages temporary directory when the program ends")
 
-    opt[Boolean]('o', "overWriteIndex").action { (value, config) =>
-      config.copy(overWriteIndex = value)
-    }.text(s"Do not preserve any pre-existing index.html in the Scaladoc root")
+    opt[Boolean]('o', "preserveIndex").action { (value, config) =>
+      config.copy(preserveIndex = value)
+    }.text(s"Preserve any pre-existing index.html in the Scaladoc root; if this option is not specified, the file is regenerated each time this program runs.")
 
     opt[String]('s', "subProjectNames").action { (value, config) =>
       config.copy(subProjectNames = value.split(",").toList)

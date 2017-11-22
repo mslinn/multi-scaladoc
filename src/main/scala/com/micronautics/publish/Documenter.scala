@@ -24,7 +24,7 @@ class Documenter(val subProjects: List[SubProject])
     try {
       setup()
       gitPull()
-      writeIndex(overWriteIndex = config.overWriteIndex)
+      writeIndex(preserveIndex = config.preserveIndex)
 
       log.info(s"Making Scaladoc for ${ subProjects.size } SBT subprojects.")
       subProjects.foreach(runScaladoc)
@@ -37,9 +37,9 @@ class Documenter(val subProjects: List[SubProject])
   }
 
 
-  protected def writeIndex(overWriteIndex: Boolean = false): Unit = {
+  protected def writeIndex(preserveIndex: Boolean = false): Unit = {
     val ghFile = ghPages.ghPagesRoot.toFile
-    if (overWriteIndex || ghFile.list.isEmpty) {
+    if (!preserveIndex || ghFile.list.isEmpty) {
       val index: File = new File(ghFile, "index.html")
       val contents: String = subProjects.map { sb =>
         s"<a href='api/latest/${ sb.name }/index.html' class='extype'><code>${ sb.name }</code></a><br/>"
