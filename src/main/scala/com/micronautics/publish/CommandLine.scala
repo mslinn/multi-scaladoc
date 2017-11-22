@@ -2,6 +2,7 @@ package com.micronautics.publish
 
 import org.slf4j.{Logger, LoggerFactory}
 import org.slf4j.event.Level
+import scala.collection.mutable
 
 object LogMessage {
   implicit val empty: LogMessage = LogMessage(Level.INFO, "")(LoggerFactory.getLogger(""))
@@ -23,12 +24,21 @@ case class LogMessage(level: Level, message: String)
   lazy val nonEmpty: Boolean = message.nonEmpty
 }
 
+/** Backed by a cache, which is preloaded with `"git" -> which(git)`, etc */
 class CommandLine(implicit config: Config = Config.default) {
   import java.io.File
   import java.nio.file.{Path, Paths}
   import java.util.regex.Pattern
   import scala.sys.process._
   import scala.util.Properties.isWin
+
+  protected lazy val cmdNameCache =
+    mutable.HashMap(
+      "git"      -> which("git"),
+      "sbt"      -> which("sbt"),
+      "scaladoc" -> which("scaladoc")
+    )
+
 
   @inline def run(cmd: String)
                  (implicit logMessage: LogMessage, log: Logger): String =
@@ -46,9 +56,9 @@ class CommandLine(implicit config: Config = Config.default) {
     val command: List[String] = whichOrThrow(tokens(0)).toString :: tokens.tail.toList
     if (logMessage.nonEmpty) logMessage.display()
     log.debug(s"# Running $cmd from '$cwd'") //, which translates to ${ command.mkString("\"", "\", \"", "\"") }")
-    if (config.dryRun) {
-      log.debug(command.mkString(" "))
-      ""
+    if (config.dryRun && (tokens.take(2) sameElements Array(which("git"), "commit"))) {
+      log.debug("# " + command.mkString(" "))
+      run(cwd, "git status")
     } else
       Process(command=command, cwd=cwd).!!.trim
   }
@@ -59,9 +69,9 @@ class CommandLine(implicit config: Config = Config.default) {
     val command: List[String] = whichOrThrow(cmd(0)).toString :: cmd.tail.toList
     if (logMessage.nonEmpty) logMessage.display()
     log.debug(s"Running ${ cmd.mkString(" ") } from '$cwd'")
-    if (config.dryRun) {
-      log.debug(command.mkString(" "))
-      ""
+    if (config.dryRun && (cmd.take(2) == Seq(which("git"), "commit"))) {
+      log.debug(s"# $cmd")
+      run(cwd, "git", "status")
     } else
       Process(command=command, cwd=cwd).!!.trim
   }
@@ -77,22 +87,26 @@ class CommandLine(implicit config: Config = Config.default) {
     run(cwd.toFile, cmd: _*)
 
 
-  def which(program: String): Option[Path] = {
-    val pathEnv = sys.env.getOrElse("PATH", sys.env.getOrElse("Path", sys.env("path")))
+  def which(programName: String): Option[Path] =
+    cmdNameCache(programName).orElse {
+      val pathEnv = sys.env.getOrElse("PATH", sys.env.getOrElse("Path", sys.env("path")))
 
-    val paths =
-      pathEnv
-        .split(Pattern.quote(File.pathSeparator))
-        .map(Paths.get(_))
+      val paths =
+        pathEnv
+          .split(Pattern.quote(File.pathSeparator))
+          .map(Paths.get(_))
 
-    paths.collectFirst {
-      case path if resolve(path, program).exists(_.toFile.exists) => resolve(path, program)
+      val result = paths.collectFirst {
+        case path if resolve(path, programName).exists(_.toFile.exists) => resolve(path, programName)
 
-      case path if isWin && resolve(path, s"$program.cmd").exists(_.toFile.exists) => resolve(path, s"$program.cmd")
+        case path if isWin && resolve(path, s"$programName.cmd").exists(_.toFile.exists) => resolve(path, s"$programName.cmd")
 
-      case path if isWin && resolve(path, s"$program.bat").exists(_.toFile.exists) => resolve(path, s"$program.bat")
-    }.flatten
-  }
+        case path if isWin && resolve(path, s"$programName.bat").exists(_.toFile.exists) => resolve(path, s"$programName.bat")
+      }.flatten
+
+      cmdNameCache.put(programName, result)
+      result
+    }
 
 
   @inline protected def resolve(path: Path, program: String): Option[Path] = {

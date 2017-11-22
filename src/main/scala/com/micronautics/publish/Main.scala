@@ -19,8 +19,8 @@ object Main extends App with OptionParsing {
 
   def doIt(implicit config: Config): Unit = {
     implicit val project: Project = Project(
-      name               = BuildInfo.name,
-      version            = BuildInfo.version
+      name    = BuildInfo.name,
+      version = BuildInfo.version
     )
 
     // subprojects to document; others are ignored (such as this one)

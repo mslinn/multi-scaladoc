@@ -13,7 +13,7 @@ trait OptionParsing {
 
     opt[Boolean]('r', "dryRun").action { (value, config) =>
       config.copy(dryRun = value)
-    }.text("Show the commands that would be run")
+    }.text("Stubs out 'git commit' and displays the command line that would be run instead, along with the output of 'git status'")
 
     opt[String]('n', "gitHubName").action { (value, config) =>
       config.copy(gitHubName = Some(value))

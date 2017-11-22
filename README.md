@@ -60,7 +60,7 @@ Usage: bin/run [options]
                            Github project ID for project to be documented
   -o, --overWriteIndex <value>
                            Do not preserve any pre-existing index.html in the Scaladoc root
-  -r, --dryRun <value>     Show the commands that would be run
+  -r, --dryRun <value>     Stubs out 'git commit' and displays the command line that would be run instead, along with the output of 'git status'
   -s, --subProjectNames <value>
                            Comma-delimited names of subprojects to generate Scaladoc for
   -u, --gitRemoteOriginUrl <value>
