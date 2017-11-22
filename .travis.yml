@@ -25,3 +25,5 @@ scala:
 
 # Use container-based infrastructure
 sudo: false
+
+script: sbt -no-colors -Djava.io.tmpdir=tmp
