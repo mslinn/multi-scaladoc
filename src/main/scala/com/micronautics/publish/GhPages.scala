@@ -43,10 +43,10 @@ case class GhPages(
 
     if (gitGitPath.toFile.exists) {
       LogMessage(DEBUG, s"gitGit exists; about to git checkout $ghPagesBranchName into gitParent").display()
-      run(apisRoot, s"git checkout $ghPagesBranchName")
+      run(apisRoot, "git", "checkout", ghPagesBranchName)
     } else {
       LogMessage(DEBUG, s"gitGit does not exist; about to create it in 2 steps.\n#  1) git clone the $ghPagesBranchName branch into gitParent").display()
-      run(apiRootFor(subProject), s"git clone -b $ghPagesBranchName ${ config.gitRemoteOriginUrl }.git")
+      run(apiRootFor(subProject), "git", "clone", "-b", ghPagesBranchName, s"{ config.gitRemoteOriginUrl }.git")
 
       LogMessage(DEBUG, s"  2) rename ${ subProject.name } to ${ subProject.baseDirectory.getName }").display()
       file(project.name).renameTo(file(subProject.baseDirectory.getName))
@@ -56,16 +56,16 @@ case class GhPages(
   def createGhPagesBranch()(implicit commandLine: CommandLine, project: Project, subProject: SubProject): Unit = {
     import commandLine.run
 
-    val repoDir = new File(root.toFile, "repo")
-    run(root, s"git clone ${ config.gitRemoteOriginUrl } $repoDir")
+    val repoDir: File = new File(root.toFile, "repo")
+    run(root, "git", "clone", config.gitRemoteOriginUrl, repoDir.getName)
 
     // Create branch with no history or content
     run(repoDir, "git", "checkout", "--orphan", ghPagesBranchName)
     Nuke.removeUnder(repoDir)
 
     // Establish the branch existence
-    run(repoDir, s"""git commit --allow-empty -m "Initialize $ghPagesBranchName branch"""")
-    run(repoDir, s"git push origin $ghPagesBranchName")
+    run(repoDir, "git", "commit", "--allow-empty", "-m", s"Initialize $ghPagesBranchName branch")
+    run(repoDir, "git", "push", "origin", ghPagesBranchName)
 
     Nuke.remove(repoDir.toPath)
   }

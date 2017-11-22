@@ -81,15 +81,15 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
       val root: Path = Files.createTempDirectory("ghPages")
       val repoDir = new File(root.toFile, "repo")
       val ghPagesBranchName = "gh-pages"
-      commandLine.run(root, s"git clone ${ config.gitRemoteOriginUrl } $repoDir")
+      commandLine.run(root, "git", "clone", config.gitRemoteOriginUrl, repoDir.getName)
       commandLine.run(repoDir, "git", "checkout", "--orphan", ghPagesBranchName)
       Nuke.removeUnderExceptGit(repoDir)
       assert(repoDir.toPath.resolve(".git").toFile.exists, ".git directory got clobbered")
       repoDir.list.length shouldBe 1
 
       // Establish the branch existence
-      commandLine.run(repoDir, s"""git commit --allow-empty -m "Initialize $ghPagesBranchName branch"""")
-      //commandLine.run(repoDir, s"git push origin $ghPagesBranchName")
+      commandLine.run(repoDir, "git", "commit", "--allow-empty", "-m", s"Initialized $ghPagesBranchName branch")
+      //commandLine.run(repoDir, "git", "push", "origin", ghPagesBranchName)
       Nuke.remove(repoDir.toPath)
     }
   }
