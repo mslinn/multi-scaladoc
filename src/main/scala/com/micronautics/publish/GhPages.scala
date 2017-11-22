@@ -3,6 +3,7 @@ package com.micronautics.publish
 import java.io.File
 import java.nio.file.{Files, Path}
 import com.micronautics.publish.Documenter.file
+import org.apache.commons.io.FileUtils
 import org.slf4j.Logger
 import org.slf4j.event.Level.DEBUG
 
@@ -14,7 +15,7 @@ object GhPages {
   * @param root directory to place the contents of GhPages */
 case class GhPages(
   deleteAfterUse: Boolean = true,
-  root: Path = Files.createTempDirectory("ghPages").toAbsolutePath
+  root: Path = Files.createTempDirectory("scaladoc").toAbsolutePath
 )(implicit config: Config, log: Logger) {
   import GhPages._
 
@@ -25,8 +26,14 @@ case class GhPages(
 
   /** Create common root for Scaladoc for every SBT sub-project, and return the [[Path]] */
   lazy val apisRoot: Path = {
-    val dir = root.resolve(s"latest/api/").toAbsolutePath
-    dir.toFile.mkdirs()
+    val dir = ghPagesRoot.resolve("latest/api/").toAbsolutePath
+    FileUtils.forceMkdir(dir.toFile)
+    dir
+  }
+
+  lazy val ghPagesRoot: Path = {
+    val dir = root.resolve("ghPages").toAbsolutePath
+    FileUtils.forceMkdir(dir.toFile)
     dir
   }
 
@@ -37,20 +44,8 @@ case class GhPages(
   protected[publish] def checkoutOrClone(gitWorkPath: Path)
                                         (implicit commandLine: CommandLine, project: Project, subProject: SubProject): Unit = {
     import commandLine.run
-
-    val gitGitPath: Path = gitWorkPath.resolve(".git")
-    dumpDirs(gitWorkPath, subProject, gitGitPath)
-
-    if (gitGitPath.toFile.exists) {
-      LogMessage(DEBUG, s"gitGit exists; about to git checkout $ghPagesBranchName into gitParent").display()
-      run(apisRoot, "git", "checkout", ghPagesBranchName)
-    } else {
-      LogMessage(DEBUG, s"gitGit does not exist; about to create it in 2 steps.\n#  1) git clone the $ghPagesBranchName branch into gitParent").display()
-      run(apiRootFor(subProject), "git", "clone", "-b", ghPagesBranchName, s"{ config.gitRemoteOriginUrl }.git")
-
-      LogMessage(DEBUG, s"  2) rename ${ subProject.name } to ${ subProject.baseDirectory.getName }").display()
-      file(project.name).renameTo(file(subProject.baseDirectory.getName))
-    }
+    run(apiRootFor(subProject), "git", "clone", "--depth", "1", "-b", ghPagesBranchName, s"{ config.gitRemoteOriginUrl }.git")
+    file(project.name).renameTo(file(subProject.baseDirectory.getName))
   }
 
 
@@ -69,7 +64,9 @@ case class GhPages(
     import commandLine.run
 
     val repoDir: File = new File(root.toFile, "repo")
-    run(root, "git", "clone", config.gitRemoteOriginUrl, repoDir.getName)
+    config.gitRemoteOriginUrl.foreach { url =>
+      run(root, "git", "clone", url, repoDir.getName) // todo try "--depth", "1",
+    }
 
     // Remove git history and content
     run(repoDir, "git", "checkout", "--orphan", ghPagesBranchName)

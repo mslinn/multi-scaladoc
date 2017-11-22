@@ -7,20 +7,16 @@ trait OptionParsing {
   val parser: OptionParser[Config] = new scopt.OptionParser[Config]("bin/doc") {
     head("Scaladoc publisher for multi-project SBT builds", BuildInfo.version)
 
-    opt[Boolean]('a', "autoCheckIn").action { (value, config) =>
-      config.copy(autoCheckIn = value)
-    }.text("Stop program if this flag is not specified and any files need to be committed or pushed")
-
     opt[String]('c', "copyright").action { (value, config) =>
       config.copy(copyright = value)
     }.text("Scaladoc footer")
 
-    opt[Boolean]('d', "deleteAfterUse").action { (value, config) =>
-      config.copy(deleteAfterUse = value)
-    }.text("Remove the GhPages temporary directory when the program ends")
+    opt[Boolean]('k', "keepAfterUse").action { (value, config) =>
+      config.copy(keepAfterUse = value)
+    }.text("Keep the GhPages temporary directory when the program ends")
 
     opt[String]('n', "gitHubName").action { (value, config) =>
-      config.copy(gitHubName = value)
+      config.copy(gitHubName = Some(value))
     }.required.text("Github project ID for project to be documented")
 
     opt[Boolean]('o', "overWriteIndex").action { (value, config) =>
@@ -36,7 +32,7 @@ trait OptionParsing {
     }.required.text(s"Comma-delimited names of subprojects to generate Scaladoc for")
 
     opt[String]('u', "gitRemoteOriginUrl").action { (value, config) =>
-      config.copy(gitRemoteOriginUrl = value)
+      config.copy(gitRemoteOriginUrl = Some(value))
     }.required.text("Github project url for project to be documented")
   }
 }

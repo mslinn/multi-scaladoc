@@ -2,14 +2,14 @@ import com.micronautics.publish._
 import java.nio.file.{Files, Path}
 import java.io.File
 import org.slf4j.Logger
-implicit val config: Config = Config.default.copy(gitHubName="mslinn", gitRemoteOriginUrl="git@github.com:mslinn/web3j-scala.git", subProjectNames=List("root", "demo"))
+implicit val config: Config = Config.default.copy(gitHubName=Some("mslinn"), gitRemoteOriginUrl=Some("git@github.com:mslinn/web3j-scala.git"), subProjectNames=List("root", "demo"))
 val root: Path = Files.createTempDirectory("ghPages")
 val repoDir = new File(root.toFile, "repo")
 val ghPagesBranchName = "gh-pages"
 implicit val commandLine: CommandLine = new CommandLine
 implicit val logger: Logger = org.slf4j.LoggerFactory.getLogger("pub")
 import commandLine.run
-run(root, s"git clone ${ config.gitRemoteOriginUrl } $repoDir")
+run(root, s"git clone --depth 1 ${ config.gitRemoteOriginUrl } $repoDir")
 run(repoDir, "git", "checkout", "--orphan", ghPagesBranchName)
 Nuke.removeUnder(repoDir)
 // Is the right directory empty?

@@ -18,9 +18,9 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
     Config
       .default
       .copy(
-        gitHubName="mslinn",
-        gitRemoteOriginUrl="git@github.com:mslinn/web3j-scala.git",
-        subProjectNames=List("root", "demo")
+        gitHubName = Some("mslinn"),
+        gitRemoteOriginUrl = Some("git@github.com:mslinn/web3j-scala.git"),
+        subProjectNames = List("root", "demo")
       )
       //.copy(deleteAfterUse = false)
 
@@ -77,12 +77,13 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
   }
 
   "GhPages branch creation" should {
-    "work" ignore {
-      // todo currently testing with a live project, need to create a dummy project for testing
+    "work" ignore { // todo currently tests with a live project, need a dummy project for testing
       val root: Path = Files.createTempDirectory("ghPages")
       val repoDir = new File(root.toFile, "repo")
       val ghPagesBranchName = "gh-pages"
-      commandLine.run(root, "git", "clone", config.gitRemoteOriginUrl, repoDir.getName)
+      config.gitRemoteOriginUrl.foreach { url =>
+        commandLine.run(root, "git", "clone", url, repoDir.getName) // todo try "--depth", "1",
+      }
       commandLine.run(repoDir, "git", "checkout", "--orphan", ghPagesBranchName)
       Nuke.removeUnderExceptGit(repoDir)
       assert(repoDir.toPath.resolve(".git").toFile.exists, ".git directory got clobbered")
@@ -107,7 +108,7 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
   }
 
   "RunScaladoc" should {
-    "work" ignore {
+    "work" ignore { // fails under travis
       subProjects.foreach(documenter.runScaladoc)
 
       ghPages.root.resolve("latest/api/demo").toFile.listFiles.length must be > 0

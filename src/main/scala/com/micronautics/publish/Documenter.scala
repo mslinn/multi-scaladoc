@@ -1,7 +1,9 @@
 package com.micronautics.publish
 
 import java.io.File
+import java.nio.charset.Charset
 import java.nio.file.Path
+import org.apache.commons.io.FileUtils
 import org.slf4j.event.Level._
 
 object Documenter {
@@ -16,13 +18,12 @@ class Documenter(val subProjects: List[SubProject])
 
   import commandLine.run
 
-  protected[publish] lazy val ghPages: GhPages = GhPages(deleteAfterUse=config.deleteAfterUse)
+  protected[publish] lazy val ghPages: GhPages = GhPages(deleteAfterUse=config.keepAfterUse)
 
   def publish(): Unit = {
     try {
       setup()
       gitPull()
-      cautiousGitCommitPush()
       writeIndex(overWriteIndex = config.overWriteIndex)
 
       log.info(s"Making Scaladoc for ${ subProjects.size } SBT subprojects.")
@@ -36,40 +37,15 @@ class Documenter(val subProjects: List[SubProject])
   }
 
 
-  protected[publish] def cautiousGitCommitPush(): Unit = {
-    // Ensure that everything is committed
-    run("git diff --name-only").replace("\n", ", ") foreach { changedFileNames =>
-      if (config.autoCheckIn) {
-        run("git add -a")(LogMessage(INFO, s"About to commit these changed files: $changedFileNames"), log)
-        run("git commit -m -")
-      } else {
-        log.error(s"These changed files need to be checked in: $changedFileNames")
-        System.exit(0)
-      }
-    }
-
-    if (log.isDebugEnabled) {
-      val stagedFileNames = run("git diff --cached --name-only").replace("\n", ", ")
-      if (stagedFileNames.nonEmpty) {
-        log.debug(s"These files have not yet been git pushed: ${ stagedFileNames.mkString(", ") }")
-        if (!config.autoCheckIn) System.exit(0)
-      }
-    }
-
-    // See https://stackoverflow.com/a/20922141/553865
-    run("git push origin HEAD")(LogMessage(INFO, "About to git push to origin"), log)
-  }
-
   protected def writeIndex(overWriteIndex: Boolean = false): Unit = {
-    val ghFile = ghPages.root.toFile
+    val ghFile = ghPages.ghPagesRoot.toFile
     if (overWriteIndex || ghFile.list.isEmpty) {
-      import java.io.PrintWriter
-      val pw = new PrintWriter(new File(ghFile, "index.html" ))
+      val index: File = new File(ghFile, "index.html")
       val contents: String = subProjects.map { sb =>
         s"<a href='api/latest/${ sb.name }/index.html' class='extype'><code>${ sb.name }</code></a><br/>"
       }.mkString("<p>", "\n", "</p>")
 
-      pw.write(
+      FileUtils.write(index,
         s"""
            |<!DOCTYPE html >
            |<html>
@@ -93,9 +69,9 @@ class Documenter(val subProjects: List[SubProject])
            |</div>
            |</body>
            |</html>
-           |""".stripMargin
+           |""".stripMargin,
+        Charset.forName("UTF-8")
       )
-      pw.close()
     }
   }
 
@@ -133,7 +109,9 @@ class Documenter(val subProjects: List[SubProject])
       run("sbt", "-no-colors", s"; project ${ subProject.name }; export runtime:fullClasspath")
         .split("\n")
         .last
-    val sourceUrl: String = s"https://github.com/${ config.gitHubName }/${ project.name }/tree/master€{FILE_PATH}.scala"
+    val sourceUrl: String = config.gitHubName.map { gitHubName =>
+      s"https://github.com/$gitHubName/${ project.name }/tree/master€{FILE_PATH}.scala"
+    }.getOrElse(throw new Exception("Error: config.gitHubName was not specified"))
     val outputDirectory: Path = ghPages.apiRootFor(subProject)
 
     Scaladoc(

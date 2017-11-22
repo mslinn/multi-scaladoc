@@ -5,14 +5,34 @@
 [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 
 This program creates Scaladoc for SBT multi-projects hosted on GitHub.
-Here is a high level description of what this program does:
-1. Checks out the master branch of the GitHub project that you specify
-2. Builds Scaladoc for each SBT subproject in your system's temporary directory
-3. Combines the Scaladocs together 
-4. Builds an index page, unless one has already been built
-5. If you have write access to the GitHub project being documented, this program checks in all of the Scaladoc into the `gh-pages` git branch.
-   The `gh-pages` branch is created if it does not already exist.
-6. Deletes the temporary directory.
+You must have write access to the GitHub project being documented.
+Following is a high-level description of what this program does for the GitHub project that you specify.
+The system's temporary directory is used for all steps.
+1. If the `gh-pages` branch exists, any existing Scaladoc for SBT subprojects is deleted, otherwise the `gh-pages` branch is created.
+2. The `master` branch is checked out.
+3. Scaladoc is built from the `master` branch source, 
+   and the Scaladoc output for each SBT subproject is created under a common root in the `gh-pages` branch.
+4. An index page is created in the Scaladoc root directory, unless one had previously been built.
+5. All of the Scaladoc is committed into the `gh-pages` git branch.
+6. The temporary directory is deleted.
+
+The following directory structure is temporarily created while the program runs. 
+`XXXX` is a random string, unique each time the program runs.
+```
+/tmp/
+  scaladocXXXX/          # Unique name for each program run
+    ghPages/             # Git project checked out as gh-pages branch
+      index.html         # created if it does not already exist
+      api/               #
+        latest/          # contents are wiped prior to generating Scaladoc
+           subProject1/  # Scaladoc for SBT subProject1 is generated here
+           subProject2/  # Scaladoc for SBT subProject2 is generated here
+           subProject3/  # Scaladoc for SBT subProject3 is generated here
+    master/              # Git project checked out as master branch (not modified, just read)
+      subProject1/       # SBT subProject1 source
+      subProject2/       # SBT subProject1 source
+      subProject3/       # SBT subProject1 source
+```
 
 ## Before Running this Program
 1. Update the version string in the target project's `build.sbt` and in this `README.md` before attempting to running this program.
@@ -30,21 +50,21 @@ The documentation for this project is generated separately for each subproject.
 For usage, simply type:
 ```
 $ bin/doc
-ScaladcoPublisher 0.1.0
+Scaladoc publisher for multi-project SBT builds 0.1.0
 Usage: bin/doc [options]
 
-  -a, --autoCheckIn <value>
-                           Stop program if any files need to be committed or pushed
   -c, --copyright <value>  Scaladoc footer
   -d, --deleteAfterUse <value>
-                           remove the GhPages temporary directory when the program ends
+                           Remove the GhPages temporary directory when the program ends
   -n, --gitHubName <value>
-                           Github ID for project
+                           Github project ID for project to be documented
   -o, --overWriteIndex <value>
                            Do not preserve any pre-existing index.html in the Scaladoc root
   -r, --dryRun <value>     Show the commands that would be run
   -s, --subProjectNames <value>
                            Comma-delimited names of subprojects to generate Scaladoc for
+  -u, --gitRemoteOriginUrl <value>
+                           Github project url for project to be documented
 ```
 
 ## Sponsor
