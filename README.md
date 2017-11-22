@@ -5,19 +5,13 @@
 [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 
 ## Publishing
-1. Update the version string in the project's `build.sbt` and in this `README.md` before attempting to publish to Bintray.
+1. Update the version string in the project's `build.sbt` and in this `README.md` before attempting to running this program.
 2. Commit changes with a descriptive comment:
    ```
    $ git add -a && git commit -m "Comment here"
    ```
-3. Tell the `sbt-git` SBT plugin where the `.git` directory is:
-   ```
-   export GIT_DIR="$(pwd)/.git"
-   ```
-4. Publish a new version of this library, including committing changes and updating the Scaladoc with this command:
-   ```
-   $ sbt publishAndTag
-   ```
+3. Publish a new version of the program being documented, including committing changes.
+4. Update the Scaladoc by running `bin/doc`.
 
 ### Updating Scaladoc
 The documentation for this project is generated separately for each subprojects.
