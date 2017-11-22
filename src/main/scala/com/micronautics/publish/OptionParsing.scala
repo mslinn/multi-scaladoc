@@ -5,7 +5,7 @@ import scopt.OptionParser
 
 trait OptionParsing {
   val parser: OptionParser[Config] = new scopt.OptionParser[Config]("bin/doc") {
-    head("Publish", BuildInfo.version)
+    head("ScaladcoPublisher", BuildInfo.version)
 
     opt[Boolean]('a', "autoCheckIn").action { (value, config) =>
       config.copy(autoCheckIn = value)
