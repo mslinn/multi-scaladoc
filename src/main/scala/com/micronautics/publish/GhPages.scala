@@ -53,21 +53,33 @@ case class GhPages(
     }
   }
 
+
+  def branchExistsLocally(branchName: String = ghPagesBranchName)
+                         (implicit commandLine: CommandLine): Boolean =
+    commandLine.run("git", "show-ref", s"refs/heads/$branchName").nonEmpty
+
+  def branchExistsRemotely(branchName: String = ghPagesBranchName)
+                          (implicit commandLine: CommandLine): Boolean =
+    commandLine
+      .run(root, "git", "rev-parse", "--verify", "--no-color", branchName)
+      .split(",")
+      .contains(ghPagesBranchName)
+
   def createGhPagesBranch()(implicit commandLine: CommandLine, project: Project, subProject: SubProject): Unit = {
     import commandLine.run
 
     val repoDir: File = new File(root.toFile, "repo")
     run(root, "git", "clone", config.gitRemoteOriginUrl, repoDir.getName)
 
-    // Create branch with no history or content
+    // Remove git history and content
     run(repoDir, "git", "checkout", "--orphan", ghPagesBranchName)
     Nuke.removeUnder(repoDir)
 
-    // Establish the branch existence
+    // Create the gh-pages branch and push it
     run(repoDir, "git", "commit", "--allow-empty", "-m", s"Initialize $ghPagesBranchName branch")
     run(repoDir, "git", "push", "origin", ghPagesBranchName)
 
-    Nuke.remove(repoDir.toPath)
+    Nuke.remove(repoDir.toPath) // All done
   }
 
   /** Delete any previous Scaladoc while keeping top 3 directories (does not mess with top-level contents). */
@@ -79,6 +91,16 @@ case class GhPages(
     } catch {
       case e: Exception => e.printStackTrace()
     }
+
+  def ghPagesBranchExists(implicit commandLine: CommandLine): Boolean = {
+    import commandLine.run
+    branchExistsLocally(ghPagesBranchName) || {
+      if (branchExistsRemotely(ghPagesBranchName)) {
+        run(root, "git", "checkout", "--track", s"origin/$ghPagesBranchName")
+        branchExistsLocally(ghPagesBranchName)
+      } else false
+    }
+  }
 
   @inline protected[publish] def dumpDirs(gitWorkPath: Path, subProject: SubProject, gitGit: Path): Unit =
     log.debug(s"""baseDirectory    = ${ subProject.baseDirectory.getAbsolutePath }

@@ -149,13 +149,16 @@ class Documenter(val subProjects: List[SubProject])
     ()
   }
 
-  /** 1) Creates any temporary directories that might be needed
-    * 2) Just checks out the top 2 directories
-    * 3) Creates new 3rd level directories to hold sbt subproject Scaladoc */
+  /** 1) Fetches or creates gh-pages branch if it is not already local
+    * 2) Creates any directories that might be needed
+    * 3) Just retains the top 2 directories
+    * 4) Creates new 3rd level directories to hold sbt subproject Scaladoc
+    * 5) Commits the branch */
   protected[publish] def setup()(implicit project: Project, subProject: SubProject): Unit = {
     try {
       ghPages.checkoutOrClone(gitWorkPath)
-      ghPages.deleteScaladoc()
+      if (ghPages.ghPagesBranchExists) ghPages.deleteScaladoc()
+      else ghPages.createGhPagesBranch()
       gitAddCommitPush()
     } catch {
       case e: Exception => log.error(e.getMessage)
