@@ -1,0 +1,17 @@
+import com.micronautics.publish._
+import java.nio.file.{Files, Path}
+import java.io.File
+implicit val config = Config.default.copy(gitHubName="mslinn", gitRemoteOriginUrl="git@github.com:mslinn/web3j-scala.git", subProjectNames="root,demo")
+val root: Path = Files.createTempDirectory("ghPages")
+val repoDir = new File(root.toFile, "repo")
+val ghPagesBranchName = "gh-pages"
+implicit val commandLine = CommandLine
+import commandLine.run
+run(root, s"git clone ${ config.gitRemoteOriginUrl } $repoDir")
+run(repoDir, "git", "checkout", "--orphan", ghPagesBranchName)
+Nuke.removeUnder(repoDir)
+// Is the right directory empty?
+// Establish the branch existence
+run(repoDir, s"""git commit --allow-empty -m "Initialize $ghPagesBranchName branch"""")
+run(repoDir, s"git push origin $ghPagesBranchName")
+Nuke.remove(repoDir.toPath)

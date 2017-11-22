@@ -17,6 +17,7 @@ case class Config(
   deleteAfterUse: Boolean = true,
   dryRun: Boolean = false,
   gitHubName: String = "mslinn", // Not a generally useful default value, but config requires a value must be specified, so we are good
+  gitRemoteOriginUrl: String = "", // Not a generally useful default value, but config requires a value must be specified, so we are good
   overWriteIndex: Boolean = false,
-  subProjectNames: List[String] = List("root", "demo")
+  subProjectNames: List[String] = Nil
 )

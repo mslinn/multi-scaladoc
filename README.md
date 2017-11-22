@@ -4,16 +4,26 @@
 [![GitHub version](https://badge.fury.io/gh/mslinn%2Fscaladoc.svg)](https://badge.fury.io/gh/mslinn%2Fscaladoc)
 [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 
-This program creates Scaladoc for SBT multiprojects hosted on GitHub.
+This program creates Scaladoc for SBT multi-projects hosted on GitHub.
+Here is a high level description of what this program does:
+1. Checks out the master branch of the GitHub project that you specify
+2. Builds Scaladoc for each SBT subproject in your system's temporary directory
+3. Combines the Scaladocs together 
+4. Builds an index page, unless one has already been built
+5. If you have write access to the GitHub project being documented, this program checks in all of the Scaladoc into the `gh-pages` git branch.
+   The `gh-pages` branch is created if it does not already exist.
+6. Deletes the temporary directory.
 
-## Publishing
+## Before Running this Program
 1. Update the version string in the target project's `build.sbt` and in this `README.md` before attempting to running this program.
 2. Commit changes with a descriptive comment:
    ```
    $ git add -a && git commit -m "Comment here"
    ```
 3. Publish a new version of the program being documented, if a published version has not already been created.
-4. Update the Scaladoc for that program by running `bin/doc` from this project with the appropriate parameters.
+   ```
+   git push origin master
+   ```
 
 ### Updating Scaladoc
 The documentation for this project is generated separately for each subproject.

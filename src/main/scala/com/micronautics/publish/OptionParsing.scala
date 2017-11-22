@@ -34,5 +34,9 @@ trait OptionParsing {
     opt[String]('s', "subProjectNames").action { (value, config) =>
       config.copy(subProjectNames = value.split(",").toList)
     }.required.text(s"Comma-delimited names of subprojects to generate Scaladoc for")
+
+    opt[String]('u', "gitRemoteOriginUrl").action { (value, config) =>
+      config.copy(gitRemoteOriginUrl = value)
+    }.required.text("Github project url for project to be documented")
   }
 }

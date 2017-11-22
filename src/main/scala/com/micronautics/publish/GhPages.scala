@@ -1,16 +1,23 @@
 package com.micronautics.publish
 
+import java.io.File
 import java.nio.file.{Files, Path}
-import com.micronautics.publish.Documenter.{file, log}
+import com.micronautics.publish.Documenter.file
 import org.slf4j.Logger
 import org.slf4j.event.Level.DEBUG
+
+object GhPages {
+  val ghPagesBranchName = "gh-pages"
+}
 
 /** @param deleteAfterUse Remove the temporary directory holding the GhPages content when the JVM shuts down
   * @param root directory to place the contents of GhPages */
 case class GhPages(
   deleteAfterUse: Boolean = true,
   root: Path = Files.createTempDirectory("ghPages")
-)(implicit log: Logger) {
+)(implicit config: Config, log: Logger) {
+  import GhPages._
+
   if (deleteAfterUse)
     Runtime.getRuntime.addShutdownHook(new Thread {
       override def run(): Unit = deleteTempDir()
@@ -35,15 +42,32 @@ case class GhPages(
     dumpDirs(gitWorkPath, subProject, gitGitPath)
 
     if (gitGitPath.toFile.exists) {
-      LogMessage(DEBUG, "gitGit exists; about to git checkout gh-pages into gitParent").display()
-      run(apisRoot, "git checkout gh-pages")
+      LogMessage(DEBUG, s"gitGit exists; about to git checkout $ghPagesBranchName into gitParent").display()
+      run(apisRoot, s"git checkout $ghPagesBranchName")
     } else {
-      LogMessage(DEBUG, "gitGit does not exist; about to create it in 2 steps.\n#  1) git clone the gh-pages branch into gitParent").display()
-      run(apiRootFor(subProject), s"git clone -b gh-pages ${ project.gitRemoteOriginUrl }.git")
+      LogMessage(DEBUG, s"gitGit does not exist; about to create it in 2 steps.\n#  1) git clone the $ghPagesBranchName branch into gitParent").display()
+      run(apiRootFor(subProject), s"git clone -b $ghPagesBranchName ${ config.gitRemoteOriginUrl }.git")
 
       LogMessage(DEBUG, s"  2) rename ${ subProject.name } to ${ subProject.baseDirectory.getName }").display()
       file(project.name).renameTo(file(subProject.baseDirectory.getName))
     }
+  }
+
+  def createGhPagesBranch()(implicit commandLine: CommandLine, project: Project, subProject: SubProject): Unit = {
+    import commandLine.run
+
+    val repoDir = new File(root.toFile, "repo")
+    run(root, s"git clone ${ config.gitRemoteOriginUrl } $repoDir")
+
+    // Create branch with no history or content
+    run(repoDir, "git", "checkout", "--orphan", ghPagesBranchName)
+    Nuke.removeUnder(repoDir)
+
+    // Establish the branch existence
+    run(repoDir, s"""git commit --allow-empty -m "Initialize $ghPagesBranchName branch"""")
+    run(repoDir, s"git push origin $ghPagesBranchName")
+
+    Nuke.remove(repoDir.toPath)
   }
 
   /** Delete any previous Scaladoc while keeping top 3 directories (does not mess with top-level contents). */

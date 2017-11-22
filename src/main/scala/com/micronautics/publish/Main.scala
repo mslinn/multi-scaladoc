@@ -19,7 +19,6 @@ object Main extends App with OptionParsing {
 
   def doIt(implicit config: Config): Unit = {
     implicit val project: Project = Project(
-      gitRemoteOriginUrl = gitRemoteOriginUrl,
       name               = BuildInfo.name,
       version            = BuildInfo.version
     )
@@ -32,5 +31,5 @@ object Main extends App with OptionParsing {
     new Documenter(subprojects).publish()
   }
 
-  def gitRemoteOriginUrl: String = commandLine.run("git config --get remote.origin.url")
+//  lazy val gitRemoteOriginUrl: String = commandLine.run("git config --get remote.origin.url")
 }

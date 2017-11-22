@@ -6,7 +6,6 @@ import java.io.File
   * @param gitRemoteOriginUrl taken from `.git/config`
   * @param version Git release version of this SBT project */
 case class Project(
-  gitRemoteOriginUrl: String,
   override val name: String,
   version: String
 ) extends SubProject(name, new File(sys.props("user.dir")).getAbsoluteFile) {
