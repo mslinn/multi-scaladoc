@@ -16,7 +16,7 @@ object Nuke {
       else s"Clearing files and directories under $root (${ root.list.mkString(", ") })"
     )
 
-    if (deleteRoot) FileUtils.deleteDirectory(root)
+    if (deleteRoot) FileUtils.forceDelete(root)
     else FileUtils.cleanDirectory(root)
   }
 
@@ -36,7 +36,7 @@ object Nuke {
                                   (implicit log: Logger): Unit =
     file
       .list((dir: File, name: String) => name == ".git" && new File(dir, name).isDirectory)
-      .foreach(remove)
+      .foreach(name => FileUtils.forceDelete(new File(file, name)))
 
 
   @inline protected def relativize(parent: Path, list: Array[String]): Array[String] =
