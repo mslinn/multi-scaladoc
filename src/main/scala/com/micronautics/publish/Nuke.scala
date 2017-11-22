@@ -35,7 +35,7 @@ object Nuke {
   @inline def removeUnderExceptGit(file: File)
                                   (implicit log: Logger): Unit =
     file
-      .list((dir: File, name: String) => dir == file && name == ".git")
+      .list((dir: File, name: String) => name == ".git" && new File(dir, name).isDirectory)
       .foreach(remove)
 
 
