@@ -35,8 +35,11 @@ object Nuke {
   @inline def removeUnderExceptGit(file: File)
                                   (implicit log: Logger): Unit =
     file
-      .list((dir: File, name: String) => name == ".git" && new File(dir, name).isDirectory)
-      .foreach(name => FileUtils.forceDelete(new File(file, name)))
+      .list((dir: File, name: String) => !(name == ".git" && new File(dir, name).isDirectory))
+      .foreach { name =>
+        val toast = new File(file, name)
+        FileUtils.forceDelete(toast)
+      }
 
 
   @inline protected def relativize(parent: Path, list: Array[String]): Array[String] =
