@@ -78,6 +78,7 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
 
   "GhPages branch creation" should {
     "work" in {
+      // todo currently testing with a live project, need to create a dummy project for testing
       val root: Path = Files.createTempDirectory("ghPages")
       val repoDir = new File(root.toFile, "repo")
       val ghPagesBranchName = "gh-pages"
@@ -89,8 +90,8 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
 
       // Establish the branch existence
       commandLine.run(repoDir, "git", "commit", "--allow-empty", "-m", s"Initialized $ghPagesBranchName branch")
-      //commandLine.run(repoDir, "git", "push", "origin", ghPagesBranchName)
-      Nuke.remove(repoDir.toPath)
+      //commandLine.run(repoDir, "git", "push", "origin", ghPagesBranchName) // this is a live test, don't want to affect the git project
+      Nuke.remove(root)
     }
   }
 
