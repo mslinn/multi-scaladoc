@@ -1,7 +1,7 @@
 package com.micronautics.publish
 
 import java.io.File
-import java.nio.file.Path
+import java.nio.file.{Files, Path}
 import buildInfo.BuildInfo
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -17,18 +17,22 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
   implicit val config: Config =
     Config
       .default
-      .copy(subProjectNames = List("root", "demo"))
+      .copy(
+        gitHubName="mslinn",
+        gitRemoteOriginUrl="git@github.com:mslinn/web3j-scala.git",
+        subProjectNames=List("root", "demo")
+      )
       //.copy(deleteAfterUse = false)
 
   implicit protected [publish] val commandLine: CommandLine = new CommandLine
 
-  val gitHubUserUrl: String = commandLine.run("git config --get remote.origin.url")
+  lazy val gitHubUserUrl: String = commandLine.run("git config --get remote.origin.url")
 
-  implicit val project: Project = Project(
-    gitRemoteOriginUrl = gitHubUserUrl,
-    name               = BuildInfo.gitRepoName,
-    version            = BuildInfo.version
-  )
+  implicit val project: Project =
+    Project(
+      name    = BuildInfo.gitRepoName,
+      version = BuildInfo.version
+    )
 
   // subprojects to document; others are ignored (such as this one)
   val subprojects: List[SubProject] =
@@ -39,10 +43,54 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
   val subProjects: List[SubProject] = documenter.subProjects
   val ghPages: GhPages = documenter.ghPages
 
-  "GhPages" should {
+  "Nuke" should {
+    "work" in {
+      val root: Path = Files.createTempDirectory("ghPages")
+
+      val abc: File = root.resolve("a/b/c").toFile
+      abc.mkdirs
+
+      val ab: File = abc.getParentFile
+      val a: File = ab.getParentFile
+
+      abc.listFiles.length shouldBe 0
+
+      ab.listFiles.length shouldBe 1
+      Nuke.removeUnder(ab)
+      ab.listFiles.length shouldBe 0
+
+      a.listFiles.length shouldBe 1
+      Nuke.remove(ab.toPath)
+      a.listFiles.length shouldBe 0
+      Nuke.remove(ab.toPath)
+      a.listFiles.length shouldBe 0
+
+      Nuke.remove(root)
+    }
+  }
+
+  "GhPages subprojects" should {
     "work" in {
       ghPages.apisRoot mustBe ghPages.root.resolve("latest/api")
       subProjects.find(_.name=="root").map(ghPages.apiRootFor).value mustBe ghPages.root.resolve("latest/api/root")
+    }
+  }
+
+  "GhPages branch creation" should {
+    "work" in {
+      val root: Path = Files.createTempDirectory("ghPages")
+      val repoDir = new File(root.toFile, "repo")
+      val ghPagesBranchName = "gh-pages"
+      commandLine.run(root, s"git clone ${ config.gitRemoteOriginUrl } $repoDir")
+      commandLine.run(repoDir, "git", "checkout", "--orphan", ghPagesBranchName)
+      Nuke.removeUnderExceptGit(repoDir)
+      assert(repoDir.toPath.resolve(".git").toFile.exists, ".git directory got clobbered")
+      repoDir.list.length shouldBe 1
+
+      // Establish the branch existence
+      commandLine.run(repoDir, s"""git commit --allow-empty -m "Initialize $ghPagesBranchName branch"""")
+      //commandLine.run(repoDir, s"git push origin $ghPagesBranchName")
+      Nuke.remove(repoDir.toPath)
     }
   }
 

@@ -1,48 +1,44 @@
 package com.micronautics.publish
 
 import java.io.File
-import java.io.IOException
-import java.nio.file.{Files, Paths, Path, SimpleFileVisitor, FileVisitResult}
-import java.nio.file.attribute.BasicFileAttributes
+import java.nio.file.{Path, Paths}
+import org.apache.commons.io.FileUtils
 import org.slf4j.Logger
 
 object Nuke {
+  implicit def pathToFile(path: Path): File = path.toFile
+
   /** Adapted from https://stackoverflow.com/a/45703150/553865 */
-  def remove(root: Path, deleteRoot: Boolean = true)
+  @inline def remove(root: Path, deleteRoot: Boolean = true)
             (implicit log: Logger): Unit = {
     log.debug(
       if (deleteRoot) s"Nuking $root"
-      else s"Clearing files and directories under $root (${ root.toFile.listFiles.mkString(", ") })"
+      else s"Clearing files and directories under $root (${ root.list.mkString(", ") })"
     )
 
-    Files.walkFileTree(root, new SimpleFileVisitor[Path] {
-      override def visitFile(file: Path, attributes: BasicFileAttributes): FileVisitResult = {
-        Files.delete(file)
-        FileVisitResult.CONTINUE
-      }
-
-      override def postVisitDirectory(dir: Path, exception: IOException): FileVisitResult = {
-        if (deleteRoot) Files.delete(dir)
-        FileVisitResult.CONTINUE
-      }
-    })
+    if (deleteRoot) FileUtils.deleteDirectory(root)
+    else FileUtils.cleanDirectory(root)
   }
 
-  def removeAll(string: String)
+  @inline def remove(string: String)
                (implicit log: Logger): Unit = remove(Paths.get(string))
 
-  def removeAll(file: File)
+  @inline def remove(file: File)
                (implicit log: Logger): Unit = remove(file.toPath)
 
-  def removeAll(path: Path)
-               (implicit log: Logger): Unit = remove(path)
-
-  def removeUnder(string: String)
+  @inline def removeUnder(string: String)
                  (implicit log: Logger): Unit = remove(Paths.get(string), deleteRoot=false)
 
-  def removeUnder(file: File)
+  @inline def removeUnder(file: File)
                  (implicit log: Logger): Unit = remove(file.toPath, deleteRoot=false)
 
-  def removeUnder(path: Path)
-                 (implicit log: Logger): Unit = remove(path, deleteRoot=false)
+  @inline def removeUnderExceptGit(file: File)
+                                  (implicit log: Logger): Unit =
+    file
+      .list((dir: File, name: String) => dir == file && name == ".git")
+      .foreach(remove)
+
+
+  @inline protected def relativize(parent: Path, list: Array[String]): Array[String] =
+    list.map(x => parent.relativize(Paths.get(x)).toString)
 }

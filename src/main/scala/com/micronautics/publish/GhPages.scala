@@ -71,7 +71,7 @@ case class GhPages(
   }
 
   /** Delete any previous Scaladoc while keeping top 3 directories (does not mess with top-level contents). */
-  def deleteScaladoc(): Unit = Nuke.removeUnder(apisRoot)
+  def deleteScaladoc(): Unit = Nuke.removeUnder(apisRoot.toFile)
 
   def deleteTempDir(): Unit =
     try {
