@@ -4,8 +4,10 @@
 [![GitHub version](https://badge.fury.io/gh/mslinn%2Fscaladoc.svg)](https://badge.fury.io/gh/mslinn%2Fscaladoc)
 [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 
+This program create Scaladoc for SBT multiprojects hosted on GitHub.
+
 ## Publishing
-1. Update the version string in the project's `build.sbt` and in this `README.md` before attempting to running this program.
+1. Update the version string in the target project's `build.sbt` and in this `README.md` before attempting to running this program.
 2. Commit changes with a descriptive comment:
    ```
    $ git add -a && git commit -m "Comment here"
@@ -14,7 +16,7 @@
 4. Update the Scaladoc by running `bin/doc`.
 
 ### Updating Scaladoc
-The documentation for this project is generated separately for each subprojects.
+The documentation for this project is generated separately for each subproject.
 For usage, simply type:
 ```
 $ bin/doc
