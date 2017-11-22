@@ -21,10 +21,10 @@ The following directory structure is temporarily created while the program runs.
 ```
 /tmp/
   scaladocXXXX/          # Unique name for each program run
-    ghPages/             # Git project checked out as gh-pages branch
+    ghPages/             # Git project checked out as gh-pages branch; an empty branch is created if non-existant
       index.html         # created if it does not already exist
-      api/               #
-        latest/          # contents are wiped prior to generating Scaladoc
+      api/               # created if it does not already exist
+        latest/          # created if it does not already exist; contents wiped before generating Scaladoc
            subProject1/  # Scaladoc for SBT subProject1 is generated here
            subProject2/  # Scaladoc for SBT subProject2 is generated here
            subProject3/  # Scaladoc for SBT subProject3 is generated here
