@@ -11,15 +11,15 @@ To see the help information for this programName, type:
 
 ENTRY_POINT="com.micronautics.publish.Main"
 
-COPYRIGHT="--copyright '&copy; Copyright 2017 Micronautics Research Corporation.'"
-DRY_RUN="--dryRun"                  # comment this out for production
+COPYRIGHT="--copyright \"&copy; Copyright 2017 Micronautics Research Corporation.\""
+DRY_RUN="--dryRun "                  # comment this out for production
 GITHUB_NAME="--gitHubName mslinn"
 KEEP_AFTER="--keepAfterUse"         # comment this out for production
 OVERWRITE_INDEX="--preserveIndex"
 PRESERVE_INDEX="--preserveIndex"
-REMOTE_URL="--gitRemoteOriginUrl 'git@github.com:mslinn/web3j-scala.git'"
+REMOTE_URL="--gitRemoteOriginUrl \"git@github.com:mslinn/web3j-scala.git\""
 SUB_PROJECTS="--subProjectNames root,demo"
 
-OPTIONS="$COPYRIGHT $KEEP_AFTER $GITHUB_NAME $OVERWRITE_INDEX $PRESERVE_INDEX $REMOTE_URL $SUB_PROJECTS"
+OPTIONS="$COPYRIGHT $DRY_RUN $KEEP_AFTER $GITHUB_NAME $KEEP_AFTER $OVERWRITE_INDEX $PRESERVE_INDEX $REMOTE_URL $SUB_PROJECTS"
 
 sbt "runMain $ENTRY_POINT $OPTIONS"
