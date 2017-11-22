@@ -71,8 +71,8 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
 
   "GhPages subprojects" should {
     "work" in {
-      ghPages.apisRoot mustBe ghPages.root.resolve("latest/api")
-      subProjects.find(_.name=="root").map(ghPages.apiRootFor).value mustBe ghPages.root.resolve("latest/api/root")
+      ghPages.apisRoot mustBe ghPages.ghPagesRoot.resolve("latest/api")
+      subProjects.find(_.name=="root").map(ghPages.apiRootFor).value mustBe ghPages.ghPagesRoot.resolve("latest/api/root")
     }
   }
 
@@ -99,11 +99,11 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
   "Setup" should {
     "work" in {
       documenter.setup()
-      val rootFileNames: Array[String] = ghPages.root.toFile.listFiles.map(_.getName)
-      logger.info(s"ghPages.root (${ ghPages.root }) contains ${ rootFileNames.mkString(", ") }")
-      rootFileNames mustBe Array("latest")
+      val ghPagesRootFileNames: Array[String] = ghPages.ghPagesRoot.toFile.listFiles.map(_.getName)
+      logger.info(s"ghPages.ghPagesRoot (${ ghPages.ghPagesRoot }) contains ${ ghPagesRootFileNames.mkString(", ") }")
+      ghPagesRootFileNames mustBe Array("latest")
       ghPages.deleteScaladoc()
-      ghPages.root.resolve("latest/api").toFile.listFiles.length mustBe 0
+      ghPages.ghPagesRoot.resolve("latest/api").toFile.listFiles.length mustBe 0
     }
   }
 
@@ -111,14 +111,14 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
     "work" ignore { // fails under travis
       subProjects.foreach(documenter.runScaladoc)
 
-      ghPages.root.resolve("latest/api/demo").toFile.listFiles.length must be > 0
-      ghPages.root.resolve("latest/api/root").toFile.listFiles.length must be > 0
+      ghPages.ghPagesRoot.resolve("latest/api/demo").toFile.listFiles.length must be > 0
+      ghPages.ghPagesRoot.resolve("latest/api/root").toFile.listFiles.length must be > 0
 
       /*import java.awt.Desktop
       import java.net.URI
 
       if (Desktop.isDesktopSupported) {
-        val demo: Path = ghPages.root.resolve("latest/api/demo")
+        val demo: Path = ghPages.ghPagesRoot.resolve("latest/api/demo")
         val uri: URI = new URI(s"file://$demo")
         Desktop.getDesktop.browse(uri)
       }*/
