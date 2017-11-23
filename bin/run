@@ -1,5 +1,18 @@
 #!/bin/bash
 
+# Edit these values to suit:
+COPYRIGHT="--copyright \"&copy; Copyright 2017 Micronautics Research Corporation.\""
+DRY_RUN="--dryRun "                  # comment this out for production
+GITHUB_NAME="--gitHubName mslinn"    # replace this with your github user id
+KEEP_AFTER="--keepAfterUse"          # comment this out for production
+#PRESERVE_INDEX="--preserveIndex"
+REMOTE_URL="--gitRemoteOriginUrl \"git@github.com:mslinn/web3j-scala.git\""  # Edit this to point to the SBT project on GitHub that you want to document
+SUB_PROJECTS="--subProjectNames root,demo"  # Edit this to include the SBT project names that you want to generate Scaladoc for
+# No need to modify anything below this line
+
+OPTIONS="$COPYRIGHT $DRY_RUN $KEEP_AFTER $GITHUB_NAME $PRESERVE_INDEX $REMOTE_URL $SUB_PROJECTS"
+
+
 function help {
   echo "This script generates Scaladoc for this project's subprojects.
 SBT and git must be installed for this script to work, and the generated Scaladoc will look better if graphviz is installed.
@@ -25,15 +38,6 @@ if [ "$1" == "-h" ]; then help; fi
 
 ENTRY="com.micronautics.publish.Main"
 
-COPYRIGHT="--copyright \"&copy; Copyright 2017 Micronautics Research Corporation.\""
-DRY_RUN="--dryRun "                  # comment this out for production
-GITHUB_NAME="--gitHubName mslinn"
-KEEP_AFTER="--keepAfterUse"         # comment this out for production
-PRESERVE_INDEX="--preserveIndex"
-REMOTE_URL="--gitRemoteOriginUrl \"git@github.com:mslinn/web3j-scala.git\""
-SUB_PROJECTS="--subProjectNames root,demo"
-
-OPTIONS="$COPYRIGHT $DRY_RUN $KEEP_AFTER $GITHUB_NAME $PRESERVE_INDEX $REMOTE_URL $SUB_PROJECTS"
 
 # Scan build.sbt for program name, Scala version and program version
 function findValue {
