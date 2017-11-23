@@ -22,7 +22,7 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
         gitRemoteOriginUrl = Some("git@github.com:mslinn/web3j-scala.git"),
         subProjectNames = List("root", "demo")
       )
-      //.copy(deleteAfterUse = false)
+      //.copy(keepAfterUse = true)
 
   implicit protected [publish] val commandLine: CommandLine = new CommandLine
 

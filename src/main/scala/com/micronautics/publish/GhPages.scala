@@ -8,8 +8,7 @@ object GhPages {
   val ghPagesBranchName = "gh-pages"
 }
 
-/** @param deleteAfterUse Remove the temporary directory holding the GhPages content when the JVM shuts down
-  * @param root directory to place the contents of GhPages */
+/** @param root directory to place the contents of GhPages */
 case class GhPages(
   root: Path = Files.createTempDirectory("scaladoc").toAbsolutePath
 )(implicit config: Config, log: Logger) {

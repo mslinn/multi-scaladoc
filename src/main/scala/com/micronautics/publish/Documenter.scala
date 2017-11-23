@@ -18,7 +18,7 @@ class Documenter(val subProjects: List[SubProject])
 
   import commandLine.run
 
-  protected[publish] lazy val ghPages: GhPages = GhPages(deleteAfterUse=config.keepAfterUse)
+  protected[publish] lazy val ghPages: GhPages = GhPages()
 
   def publish(): Unit = {
     try {
