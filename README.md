@@ -54,13 +54,13 @@ Scaladoc publisher for multi-project SBT builds 0.1.0
 Usage: bin/run [options]
 
   -c, --copyright <value>  Scaladoc footer
-  -r, --dryRun             Stubs out 'git commit' and displays the command line that would be run instead, along with the output of 'git status'
+  -d, --dryRun             Stubs out 'git commit' and displays the command line that would be run instead, along with the output of 'git status'
   -n, --gitHubName <value>
                            Github project ID for project to be documented
   -u, --gitRemoteOriginUrl <value>
                            Github project url for project to be documented
   -k, --keepAfterUse       Keep the GhPages temporary directory when the program ends
-  -o, --preserveIndex      Preserve any pre-existing index.html in the Scaladoc root; if this option is not specified, the file is regenerated each time this program runs.
+  -p, --preserveIndex      Preserve any pre-existing index.html in the Scaladoc root; if this option is not specified, the file is regenerated each time this program runs.
   -s, --subProjectNames <value>
                            Comma-delimited names of subprojects to generate Scaladoc for
 ```
