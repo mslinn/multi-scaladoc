@@ -11,7 +11,7 @@ trait OptionParsing {
       config.copy(copyright = value)
     }.text("Scaladoc footer")
 
-    opt[Unit]('r', "dryRun").action { (_, config) =>
+    opt[Unit]('d', "dryRun").action { (_, config) =>
       config.copy(dryRun = true)
     }.text("Stubs out 'git commit' and displays the command line that would be run instead, along with the output of 'git status'")
 
@@ -27,7 +27,7 @@ trait OptionParsing {
       config.copy(keepAfterUse = true)
     }.text("Keep the GhPages temporary directory when the program ends")
 
-    opt[Unit]('o', "preserveIndex").action { (_, config) =>
+    opt[Unit]('p', "preserveIndex").action { (_, config) =>
       config.copy(preserveIndex = true)
     }.text(s"Preserve any pre-existing index.html in the Scaladoc root; if this option is not specified, the file is regenerated each time this program runs.")
 
