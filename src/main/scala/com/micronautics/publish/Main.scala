@@ -25,7 +25,8 @@ object Main extends App with OptionParsing {
 
     // subprojects to document; others are ignored (such as this one)
     val subprojects: List[SubProject] =
-      List("root", "demo")
+      config
+        .subProjectNames
         .map { subProjectName => new SubProject(subProjectName, new File(subProjectName).getAbsoluteFile) }
 
     new Documenter(subprojects).publish()
