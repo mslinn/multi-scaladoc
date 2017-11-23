@@ -20,8 +20,8 @@ To see the help information for this program, type:
 The following environment variables can be used to provide configuration information to the program:
 SCALADOC_COPYRIGHT, SCALADOC_DRYRUN, SCALADOC_GITHUB_NAME, SCALADOC_KEEP, SCALADOC_PRESERVE_INDEX, SCALADOC_GIT_URL, SCALADOC_SUB_PROJECT_NAMES
 
-The following environment variables can be overridden by command-line parameters:
-SCALADOC_DRYRUN, SCALADOC_KEEP, SCALADOC_PRESERVE_INDEX
+Only the following environment variables can be overridden by command-line parameters:
+SCALADOC_DRYRUN (-r), SCALADOC_KEEP (-k), SCALADOC_PRESERVE_INDEX (-p)
 
 To run this script in debug mode so a debugger can remotely attach to it, use the -d option:
     bin/run -d
