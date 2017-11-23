@@ -9,7 +9,7 @@ object Main extends App with OptionParsing {
 
   implicit val logger: Logger = org.slf4j.LoggerFactory.getLogger("pub")
 
-  parser.parse(args, Config.fromEnvVars) match {
+  parser.parse(args, Config.default) match {
      case Some(config) => main(config)
 
      case None =>

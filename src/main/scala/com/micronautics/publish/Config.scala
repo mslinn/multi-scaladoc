@@ -2,16 +2,6 @@ package com.micronautics.publish
 
 object Config {
   val default: Config = Config()
-
-  def fromEnvVars: Config =
-    default
-      .copy(copyright          = sys.env.getOrElse("SCALADOC_COPYRIGHT", default.copyright))
-      .copy(dryRun             = sys.env.get("SCALADOC_DRYRUN").map(_.toBoolean).getOrElse(default.dryRun))
-      .copy(gitHubName         = sys.env.get("SCALADOC_GITHUB_NAME").orElse(default.gitHubName))
-      .copy(gitRemoteOriginUrl = sys.env.get("SCALADOC_GIT_URL").orElse(default.gitRemoteOriginUrl))
-      .copy(keepAfterUse       = sys.env.get("SCALADOC_KEEP").map(_.toBoolean).getOrElse(default.keepAfterUse))
-      .copy(preserveIndex      = sys.env.get("SCALADOC_PRESERVE_INDEX").map(_.toBoolean).getOrElse(default.preserveIndex))
-      .copy(subProjectNames    = sys.env.get("SCALADOC_SUB_PROJECT_NAMES").map(_.split(",").toList).getOrElse(default.subProjectNames))
 }
 
 /** @param copyright Scaladoc footer
