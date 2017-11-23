@@ -112,6 +112,7 @@ class Documenter(val subProjects: List[SubProject])
       run("sbt", "-no-colors", s"; project ${ subProject.name }; export runtime:fullClasspath")
         .split("\n")
         .last
+
     val sourceUrl: String = config.gitHubName.map { gitHubName =>
       s"https://github.com/$gitHubName/${ project.name }/tree/master€{FILE_PATH}.scala"
     }.getOrElse(throw new Exception("Error: config.gitHubName was not specified"))

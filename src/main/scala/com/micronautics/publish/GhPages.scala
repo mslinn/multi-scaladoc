@@ -11,12 +11,11 @@ object GhPages {
 /** @param deleteAfterUse Remove the temporary directory holding the GhPages content when the JVM shuts down
   * @param root directory to place the contents of GhPages */
 case class GhPages(
-  deleteAfterUse: Boolean = true,
   root: Path = Files.createTempDirectory("scaladoc").toAbsolutePath
 )(implicit config: Config, log: Logger) {
   import com.micronautics.publish.GhPages._
 
-  if (deleteAfterUse)
+  if (!config.keepAfterUse)
     Runtime.getRuntime.addShutdownHook(new Thread {
       override def run(): Unit = deleteTempDir()
     })
