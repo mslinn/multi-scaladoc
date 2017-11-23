@@ -8,21 +8,25 @@ trait OptionParsing {
   def overrides(envVar: String): String =
     s"This command-line parameter overrides the $envVar environment variable."
 
-  def wrap(text: String, lineWidth: Int = 80, leftPad: Int = 8): String = {
-    var spaceLeft = lineWidth
-    val result = new StringBuffer
-    val tokenizer = new StringTokenizer(text)
-    while (tokenizer.hasMoreTokens) {
-      val word: String = tokenizer.nextToken
-      if ((word.length + 1) > spaceLeft) {
-        result.append("\n" + (" " * leftPad) + word + " ")
-        spaceLeft = lineWidth - word.length - leftPad
+  // Taken from https://github.com/scopt/scopt/issues/60
+  def wrap(string: String, leftOffset: Int = 8, maxWidth: Int = 80): String = {
+    val oneLine = string.lines.mkString(" ").split(' ')
+    lazy val indent = " " * leftOffset
+    val output = new StringBuilder(oneLine.head)
+    var currentLineWidth = oneLine.head.length
+    for(chunk <- oneLine.tail) {
+      val addedWidth = currentLineWidth + chunk.length + 1
+      if (addedWidth > maxWidth){
+        output.append(s"\n$indent")
+        output.append(chunk)
+        currentLineWidth = chunk.length
       } else {
-        result.append(word + " ")
-        spaceLeft -= (word.length + 1)
+        currentLineWidth = addedWidth
+        output.append(' ')
+        output.append(chunk)
       }
     }
-    result.toString + "\n"
+    output.mkString + "\n"
   }
 
   val parser: OptionParser[Config] = new scopt.OptionParser[Config]("bin/run") {
