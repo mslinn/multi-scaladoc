@@ -1,8 +1,7 @@
 package com.micronautics.publish
 
-import java.util.StringTokenizer
 import buildInfo.BuildInfo
-import scopt.OptionParser
+import scopt.{OptionParser, RenderingMode}
 
 trait OptionParsing {
   def overrides(envVar: String): String =
@@ -32,7 +31,7 @@ trait OptionParsing {
   val parser: OptionParser[Config] = new scopt.OptionParser[Config]("bin/run") {
     head("Scaladoc publisher for multi-project SBT builds", BuildInfo.version)
 
-    override def renderingMode = scopt.RenderingMode.OneColumn
+    override def renderingMode: RenderingMode.OneColumn.type = scopt.RenderingMode.OneColumn
 
     opt[String]('c', "copyright").action { (value, config) =>
       config.copy(copyright = value)
