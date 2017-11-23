@@ -24,7 +24,7 @@ case class GhPages(
   /** Create common root for Scaladoc for every SBT sub-project, and return the [[Path]] */
   protected[publish] lazy val apisRoot: Path = {
     val dir = ghPagesRoot.resolve("latest/api/").toAbsolutePath
-    FileUtils.forceMkdir(dir.toFile)
+//    FileUtils.forceMkdir(dir.toFile)
     dir
   }
 
@@ -56,6 +56,8 @@ case class GhPages(
     import commandLine.run
     config.gitRemoteOriginUrl.map { remoteUrl =>
       run(root, "git", "clone", "--depth", "1", "-b", ghPagesBranchName, remoteUrl, "ghPages")
+      FileUtils.forceMkdir(apisRoot.toFile)
+      ""
     }.orElse(throw new Exception("Error: config.gitRemoteOriginUrl was not specified"))
   }
 

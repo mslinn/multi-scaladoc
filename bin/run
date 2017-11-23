@@ -9,6 +9,7 @@ To see the help information for this programName, type:
   exit
 }
 
+DEBUG="-jvm-debug 5005" # comment this out for production
 ENTRY_POINT="com.micronautics.publish.Main"
 
 COPYRIGHT="--copyright \"&copy; Copyright 2017 Micronautics Research Corporation.\""
@@ -21,4 +22,4 @@ SUB_PROJECTS="--subProjectNames root,demo"
 
 OPTIONS="$COPYRIGHT $DRY_RUN $KEEP_AFTER $GITHUB_NAME $PRESERVE_INDEX $REMOTE_URL $SUB_PROJECTS"
 
-sbt "runMain $ENTRY_POINT $OPTIONS $*"
+sbt $DEBUG "runMain $ENTRY_POINT $OPTIONS $*"
