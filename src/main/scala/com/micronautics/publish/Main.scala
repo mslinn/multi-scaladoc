@@ -1,7 +1,6 @@
 package com.micronautics.publish
 
 import java.io.File
-import buildInfo.BuildInfo
 import org.slf4j.Logger
 
 /** Utility for creating combined Scaladoc for an SBT multi-project */

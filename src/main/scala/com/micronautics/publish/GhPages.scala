@@ -1,6 +1,6 @@
 package com.micronautics.publish
 
-import java.nio.file.{Files, Path}
+import java.nio.file.Path
 import org.apache.commons.io.FileUtils
 import org.slf4j.Logger
 

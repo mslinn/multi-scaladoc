@@ -21,8 +21,8 @@ case class Documenter(
   commandLine: CommandLine,
   config: Config
 ) {
+  import com.micronautics.publish.Documenter._
   import commandLine.run
-  import Documenter._
 
   config.gitRemoteOriginUrl.map { url =>
    run(root, "git", "clone", "--depth", "1", url, "master")
@@ -54,6 +54,7 @@ case class Documenter(
         createScaladocFor(subProject)
         gitAddCommitPush(LogMessage(INFO, "Uploading Scaladoc to GitHub Pages"))
       }
+      if (config.keepAfterUse) LogMessage(INFO, s"The temporary directory at $root  has been preserved.")
     } catch {
       case e: Exception =>
         log.error(e.getMessage)

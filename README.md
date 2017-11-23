@@ -6,21 +6,83 @@
 
 This program creates Scaladoc for SBT multi-projects hosted on GitHub.
 You must have write access to the GitHub project being documented.
-Following is a high-level description of what this program does for the GitHub project that you specify.
-The system's temporary directory is used for all steps; this is often `/tmp`.
-1. If the `gh-pages` branch exists, any existing Scaladoc for SBT subprojects is deleted, otherwise the `gh-pages` branch is created.
-2. The `master` branch is checked out.
-3. Scaladoc is built from the `master` branch source, 
-   and the Scaladoc output for each SBT subproject is created under a common root in the `gh-pages` branch.
-4. An index page is created in the Scaladoc root directory, unless one had previously been built.
-5. All of the Scaladoc is committed into the `gh-pages` git branch.
-6. The temporary directory is deleted.
+
+Output will be made available at your GhPages mini-site, in a subdirectory named after the GitHub project being documented.
+For example, if your GitHub user id is `mslinn` and your project is called `web3j-scala`, Scaladoc output will be viewable at
+[mslinn.github.io/web3j-scala/index.html](http://mslinn.github.io/web3j-scala/index.html).
+Note that [GitHub pages do not support SSL certificates for custom subdomains](https://github.com/isaacs/github/issues/156).
+
+## Before Running this Program
+The following is a recommended best practice; this program will work fine if you do not do this, 
+however your users will hate you for being sloppy.
+
+1. Ensure the version string in the target project's `build.sbt` is current before running this program.
+2. Commit changes with a descriptive comment and make a tag. 
+   Here is an example of how to do that from a bash prompt, for version 0.1.0 of your project:
+   ```
+   $ git add -a && git commit -m "Releasing v0.1.0" && git tag -a "0.1.0" -m "v0.1.0" && git push origin master --tags
+   ```
+
+### Running the Program
+Edit the `bin/run` script to suit your needs before running this program.
+
+For help information, simply type `bin/run -h`:
+```
+$ bin/run -h
+This script generates Scaladoc for this project's subprojects.
+SBT and git must be installed for this script to work, and the generated Scaladoc will look better if graphviz is installed.
+To see the help information for this programName, type:
+    bin/run -h
+
+To run this script in debug mode so a debugger can remotely attach to it, use the -d option:
+    bin/run -d
+
+This script builds a fat jar, which takes longer the first time it runs, but speeds up subsequent invocations.
+The -j option forces a rebuild of the jar:
+    bin/run -j
+
+Scaladoc publisher for multi-project SBT builds 0.1.0
+Usage: bin/run [options]
+
+  -c, --copyright <value>  Scaladoc footer
+  -h, --help               Display this help message
+  -k, --keepAfterUse       Keep the GhPages temporary directory when the program ends
+  -n, --gitHubName <value>
+                           Github project ID for project to be documented
+  -p, --preserveIndex      Preserve any pre-existing index.html in the Scaladoc root; if this option is not specified, the file is regenerated each time this program runs.
+  -r, --dryRun             Stubs out 'git commit' and displays the command line that would be run instead, along with the output of 'git status'
+  -s, --subProjectNames <value>
+                           Comma-delimited names of subprojects to generate Scaladoc for
+  -u, --gitRemoteOriginUrl <value>
+                           Github project url for project to be documented
+```
+
+If you want to repetitively generate Scaladoc and view the results locally until you are satisfied that the Scaladoc meets your standards,
+and only then commit to GitHub pages, 
+specify both the `--dryRun` and `--keepAfterUse` flags.
+If you do this, you will eventually have to delete the temporary directory manually.
+
+## How It Works
+The system's temporary directory is used for all steps; for Mac, Linux and Windows Subsystem for Linux this is often `/tmp`.
+For [native Windows](https://stackoverflow.com/a/29716813/553865) the temporary directory defaults to `%TMP%`. 
+Following is a high-level description of what this program does for the SBT project on GitHub being documented.
+
+1. A temporary directory called `scaladocXXXX` is created.
+   `XXXX` is a random string, guaranteed to be unique each time the program runs.
+2. The `master` branch is checked out within the temporary directory.
+3. If the `gh-pages` branch of the Git project exists, 
+   it is cloned into the `ghPages` directory under the temporary directory and any existing Scaladoc for SBT subprojects is deleted, 
+   otherwise the `gh-pages` branch is created in the `ghPages` directory under the temporary directory.
+4. Scaladoc for each SBT subproject is built from the `master` branch source, 
+   and the Scaladoc output is written into subdirectories named after the SBT subprojects under the `ghPages` directory.
+5. An index page is created in the `ghPages` directory, unless one had previously been built and the `--preserveIndex` switch was specified.
+6. The `gh-pages` branch in the `ghPages` directory is committed; this includes all of the Scaladoc and `index.html`.
+7. The temporary directory is deleted unless the `--keepAfterUse` switch is specified.
 
 The following directory structure is temporarily created while the program runs. 
-`XXXX` is a random string, unique each time the program runs.
 ```
 /tmp/
-  scaladocXXXX/          # Unique name for each program run
+  scaladocXXXX/          # A unique name is generated for this temporary directory each time this program runs
     ghPages/             # Git project checked out as gh-pages branch; an empty branch is created if non-existant
       index.html         # created if it does not already exist
       api/               # created if it does not already exist
@@ -32,37 +94,6 @@ The following directory structure is temporarily created while the program runs.
       subProject1/       # SBT subProject1 source
       subProject2/       # SBT subProject1 source
       subProject3/       # SBT subProject1 source
-```
-
-## Before Running this Program
-1. Update the version string in the target project's `build.sbt` and in this `README.md` before attempting to running this program.
-2. Commit changes with a descriptive comment:
-   ```
-   $ git add -a && git commit -m "Comment here"
-   ```
-3. Publish a new version of the program being documented, if a published version has not already been created.
-   ```
-   git push origin master
-   ```
-
-### Updating Scaladoc
-The documentation for this project is generated separately for each subproject.
-For usage, simply type:
-```
-$ bin/run
-Scaladoc publisher for multi-project SBT builds 0.1.0
-Usage: bin/run [options]
-
-  -c, --copyright <value>  Scaladoc footer
-  -d, --dryRun             Stubs out 'git commit' and displays the command line that would be run instead, along with the output of 'git status'
-  -n, --gitHubName <value>
-                           Github project ID for project to be documented
-  -u, --gitRemoteOriginUrl <value>
-                           Github project url for project to be documented
-  -k, --keepAfterUse       Keep the GhPages temporary directory when the program ends
-  -p, --preserveIndex      Preserve any pre-existing index.html in the Scaladoc root; if this option is not specified, the file is regenerated each time this program runs.
-  -s, --subProjectNames <value>
-                           Comma-delimited names of subprojects to generate Scaladoc for
 ```
 
 ## Sponsor
