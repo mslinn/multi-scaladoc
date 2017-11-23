@@ -94,7 +94,7 @@ case class Documenter(
   protected[publish] def gitAddCommitPush(message: LogMessage = LogMessage.empty)
                                          (implicit subProject: SubProject): Unit = {
     FileUtils.forceMkdir(ghPages.apiRootFor(subProject).toFile)
-    run(ghPages.root, "git add -a")(message, log)
+    run(ghPages.root, "git add --all")(message, log)
     run(ghPages.root, "git commit -m -")
     run(ghPages.root, "git push origin HEAD")
   }
