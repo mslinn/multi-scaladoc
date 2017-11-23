@@ -1,16 +1,14 @@
 #!/bin/bash
 
 # Edit these values to suit:
-COPYRIGHT="--copyright \"&copy; Copyright 2017 Micronautics Research Corporation.\""
-DRY_RUN="--dryRun "                  # comment this out for production
-GITHUB_NAME="--gitHubName mslinn"    # replace this with your github user id
-KEEP_AFTER="--keepAfterUse"          # comment this out for production
-#PRESERVE_INDEX="--preserveIndex"
-REMOTE_URL="--gitRemoteOriginUrl \"git@github.com:mslinn/web3j-scala.git\""  # Edit this to point to the SBT project on GitHub that you want to document
-SUB_PROJECTS="--subProjectNames root,demo"  # Edit this to include the SBT project names that you want to generate Scaladoc for
+export COPYRIGHT="Copyright 2017 Micronautics Research Corporation."
+export DRY_RUN="--dryRun"                   # comment this out for production
+export GITHUB_NAME="mslinn"    # replace this with your github user id
+export KEEP_AFTER="--keepAfterUse"          # comment this out for production
+#export PRESERVE_INDEX="--preserveIndex"
+export REMOTE_URL="git@github.com:mslinn/web3j-scala.git"  # Edit this to point to the SBT project on GitHub that you want to document
+export SUB_PROJECTS="root,demo"  # Edit this to include the SBT project names that you want to generate Scaladoc for
 # No need to modify anything below this line
-
-OPTIONS="$COPYRIGHT $DRY_RUN $KEEP_AFTER $GITHUB_NAME $PRESERVE_INDEX $REMOTE_URL $SUB_PROJECTS"
 
 
 function help {
@@ -68,14 +66,14 @@ function runFatJar {
   
     if [ "$1" == -j ]; then shift; fi
   fi
-  
-  java -cp "$JAR" "$ENTRY" "$@"
+
+  java -cp "$JAR" "$ENTRY" --copyright "$COPYRIGHT" $DRY_RUN $KEEP_AFTER --gitHubName "$GITHUB_NAME" $PRESERVE_INDEX --gitRemoteOriginUrl "$REMOTE_URL" --subProjectNames "$SUB_PROJECTS" "$@"
 }
 
 if [ "$1" == "-d" ]; then
   shift
   DEBUG="-jvm-debug 5005"
-  sbt $DEBUG "runMain $ENTRY $OPTIONS $*"
+  sbt $DEBUG "runMain $ENTRY --copyright "$COPYRIGHT" $DRY_RUN $KEEP_AFTER --gitHubName "$GITHUB_NAME" $PRESERVE_INDEX --gitRemoteOriginUrl "$REMOTE_URL" --subProjectNames "$SUB_PROJECTS" $*"
 else
   runFatJar "$@"
 fi
