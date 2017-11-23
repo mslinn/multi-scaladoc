@@ -20,7 +20,10 @@ however your users will hate you for being sloppy.
 2. Commit changes with a descriptive comment and make a tag. 
    Here is an example of how to do that from a bash prompt, for version 0.1.0 of your project:
    ```
-   $ git add -a && git commit -m "Releasing v0.1.0" && git tag -a "0.1.0" -m "v0.1.0" && git push origin master --tags
+   $ git add -A && \
+   git commit -m "Releasing v0.1.0" && \
+   git tag -a "0.1.0" -m "v0.1.0" && \
+   git push origin master --tags
    ```
 
 ### Running the Program
