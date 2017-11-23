@@ -32,11 +32,11 @@ class CommandLine(implicit config: Config = Config.default) {
   import scala.sys.process._
   import scala.util.Properties.isWin
 
-  protected lazy val cmdNameCache =
+  protected val cmdNameCache =
     mutable.HashMap(
-      "git"      -> which("git"),
-      "sbt"      -> which("sbt"),
-      "scaladoc" -> which("scaladoc")
+      "git"      -> which("git", useCache=false),
+      "sbt"      -> which("sbt", useCache=false),
+      "scaladoc" -> which("scaladoc", useCache=false)
     )
 
 
@@ -87,24 +87,24 @@ class CommandLine(implicit config: Config = Config.default) {
     run(cwd.toFile, cmd: _*)
 
 
-  def which(programName: String): Option[Path] =
-    cmdNameCache(programName).orElse {
-      val pathEnv = sys.env.getOrElse("PATH", sys.env.getOrElse("Path", sys.env("path")))
+  protected lazy val pathEnv: String = sys.env.getOrElse("PATH", sys.env.getOrElse("Path", sys.env("path")))
 
-      val paths =
-        pathEnv
-          .split(Pattern.quote(File.pathSeparator))
-          .map(Paths.get(_))
+  protected lazy val paths: Array[Path] =
+    pathEnv
+      .split(Pattern.quote(File.pathSeparator))
+      .map(Paths.get(_))
 
+  def which(programName: String, useCache: Boolean = true): Option[Path] =
+    (if (useCache) cmdNameCache(programName) else None) orElse {
       val result = paths.collectFirst {
-        case path if resolve(path, programName).exists(_.toFile.exists) => resolve(path, programName)
+        case path if resolve(path, programName).exists(_.toFile.exists)                  => resolve(path, programName)
 
         case path if isWin && resolve(path, s"$programName.cmd").exists(_.toFile.exists) => resolve(path, s"$programName.cmd")
 
         case path if isWin && resolve(path, s"$programName.bat").exists(_.toFile.exists) => resolve(path, s"$programName.bat")
       }.flatten
 
-      cmdNameCache.put(programName, result)
+      if (useCache) cmdNameCache.put(programName, result)
       result
     }
 
