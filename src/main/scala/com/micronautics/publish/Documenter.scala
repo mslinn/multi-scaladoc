@@ -27,6 +27,7 @@ case class Documenter(
 
   protected[publish] lazy val ghPages: GhPages = GhPages(root.resolve("ghPages"))
 
+  /** Path where the master branch of the project is cloned into */
   protected[publish] lazy val masterDir: Path = root.resolve("master")
 
   def publish(): Unit = {
