@@ -1,6 +1,7 @@
 package com.micronautics.publish
 
 import java.io.File
+import java.nio.file.Files
 import buildInfo.BuildInfo
 import org.slf4j.Logger
 
@@ -24,12 +25,15 @@ object Main extends App with OptionParsing {
     )
 
     // subprojects to document; others are ignored
-    val subprojects: List[SubProject] =
+    val subProjects: List[SubProject] =
       config
         .subProjectNames
         .map { name => SubProject(baseDirectory = new File(name).getAbsoluteFile, name = name) }
 
-    new Documenter(subprojects).publish()
+    new Documenter(
+      root = Documenter.temporaryDirectory,
+      subProjects = subProjects
+    ).publish()
   }
 
 //  lazy val gitRemoteOriginUrl: String = commandLine.run("git config --get remote.origin.url")

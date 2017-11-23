@@ -2,7 +2,7 @@ package com.micronautics.publish
 
 import java.io.File
 import java.nio.charset.Charset
-import java.nio.file.Path
+import java.nio.file.{Files, Path}
 import org.apache.commons.io.FileUtils
 import org.slf4j.event.Level._
 
@@ -10,20 +10,28 @@ object Documenter {
   @inline def file(name: String): File = new File(name)
 
   implicit val log: org.slf4j.Logger = org.slf4j.LoggerFactory.getLogger("pub")
+
+  @inline def temporaryDirectory: Path = Files.createTempDirectory("scaladoc").toAbsolutePath
 }
 
-class Documenter(val subProjects: List[SubProject])
-                (implicit commandLine: CommandLine, config: Config, project: Project) {
+case class Documenter(
+  root: Path,
+  subProjects: List[SubProject]
+)(implicit
+  commandLine: CommandLine,
+  config: Config,
+  project: Project
+) {
+  import commandLine.run
   import Documenter._
 
-  import commandLine.run
+  protected[publish] lazy val ghPages: GhPages = GhPages(root.resolve("ghPages"))
 
-  protected[publish] lazy val ghPages: GhPages = GhPages()
+  protected[publish] lazy val masterDir: Path = root.resolve("master")
 
   def publish(): Unit = {
     try {
       subProjects.foreach(subProject => setup(project, subProject))
-      gitPull()
       writeIndex(preserveIndex = config.preserveIndex)
 
       log.info(s"Making Scaladoc for ${ subProjects.size } SBT subprojects.")
@@ -78,45 +86,27 @@ class Documenter(val subProjects: List[SubProject])
     }
   }
 
-  @inline protected[publish] def gitPull(): Unit =
-    run("git pull")(LogMessage(INFO, "Fetching latest updates for this git repo"), log)
-
   protected[publish] def gitAddCommitPush(message: LogMessage = LogMessage.empty)
                                          (implicit subProject: SubProject): Unit = {
-    run(gitWorkPath, "git add -a")(message, log)
-    run(gitWorkPath, "git commit -m -")
-    run(gitWorkPath, "git push origin HEAD")
+    FileUtils.forceMkdir(ghPages.apiRootFor(subProject).toFile)
+    run(ghPages.root, "git add -a")(message, log)
+    run(ghPages.root, "git commit -m -")
+    run(ghPages.root, "git push origin HEAD")
   }
-
-  protected[publish] def gitTag(cwd: File)
-                               (implicit subProject: SubProject): Unit = {
-    LogMessage(INFO, s"Creating git tag for v${ project.version }").display()
-    run(s"""git tag -a ${ project.version } -m ${ project.version }""")
-    run(s"""git push origin --tags""")
-    ()
-  }
-
- /* protected @inline def gitWorkParent(implicit subProject: SubProject, scalaCompiler: ScalaCompiler): File =
-    new File(subProject.crossTarget, "api")*/
-
-  @inline protected[publish] def gitWorkPath(implicit subProject: SubProject): Path =
-    ghPages.apiRootFor(subProject)
-
-//  @inline protected[publish] def gitWorkTree(implicit subProject: SubProject): String =
-//    s"--work-tree=$gitWorkPath"
 
   protected[publish] def runScaladoc(subProject: SubProject): Unit = {
     log.info(s"Creating Scaladoc for ${ subProject.name }.")
 
+    val outputDirectory: Path = ghPages.apiRootFor(subProject)
+
     val classPath: String =
-      run("sbt", "-no-colors", s"; project ${ subProject.name }; export runtime:fullClasspath")
+      run(masterDir, "sbt", "-no-colors", s"; project ${ subProject.name }; export runtime:fullClasspath")
         .split("\n")
         .last
 
     val sourceUrl: String = config.gitHubName.map { gitHubName =>
       s"https://github.com/$gitHubName/${ project.name }/tree/master€{FILE_PATH}.scala"
     }.getOrElse(throw new Exception("Error: config.gitHubName was not specified"))
-    val outputDirectory: Path = ghPages.apiRootFor(subProject)
 
     Scaladoc(
       classPath = classPath,
@@ -138,7 +128,7 @@ class Documenter(val subProjects: List[SubProject])
     * 5) Commits the branch */
   protected[publish] def setup(implicit project: Project, subProject: SubProject): Unit = {
     try {
-      ghPages.clone(gitWorkPath)
+      ghPages.clone(ghPages.apiRootFor(subProject))
       if (ghPages.ghPagesBranchExists) ghPages.deleteScaladoc()
       else ghPages.createGhPagesBranch()
       gitAddCommitPush()

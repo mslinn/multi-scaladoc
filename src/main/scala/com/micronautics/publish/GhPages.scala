@@ -10,7 +10,7 @@ object GhPages {
 
 /** @param root directory to place the contents of GhPages */
 case class GhPages(
-  root: Path = Files.createTempDirectory("scaladoc").toAbsolutePath
+  root: Path
 )(implicit config: Config, log: Logger) {
   import com.micronautics.publish.GhPages._
 

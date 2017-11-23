@@ -35,12 +35,14 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
     )
 
   // subprojects to document; others are ignored (such as this one)
-  val subprojects: List[SubProject] =
+  val subProjects: List[SubProject] =
     List("root", "demo")
       .map(name => SubProject(new File(name).getAbsoluteFile, name))
 
-  val documenter = new Documenter(subprojects)
-  val subProjects: List[SubProject] = documenter.subProjects
+  val documenter = new Documenter(
+    root = Documenter.temporaryDirectory,
+    subProjects = subProjects
+  )
   val ghPages: GhPages = documenter.ghPages
 
   "Nuke" should {
