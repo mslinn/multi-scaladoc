@@ -37,7 +37,7 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
   // subprojects to document; others are ignored (such as this one)
   val subprojects: List[SubProject] =
     List("root", "demo")
-      .map(x => new SubProject(x, new File(x).getAbsoluteFile))
+      .map(name => SubProject(new File(name).getAbsoluteFile, name))
 
   val documenter = new Documenter(subprojects)
   val subProjects: List[SubProject] = documenter.subProjects
@@ -98,7 +98,7 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
 
   "Setup" should {
     "work" in {
-      documenter.setup()
+      documenter.setup(project, subProjects.head)
       val ghPagesRootFileNames: Array[String] = ghPages.ghPagesRoot.toFile.listFiles.map(_.getName)
       logger.info(s"ghPages.ghPagesRoot (${ ghPages.ghPagesRoot }) contains ${ ghPagesRootFileNames.mkString(", ") }")
       ghPagesRootFileNames mustBe Array("latest")

@@ -23,11 +23,11 @@ object Main extends App with OptionParsing {
       version = BuildInfo.version
     )
 
-    // subprojects to document; others are ignored (such as this one)
+    // subprojects to document; others are ignored
     val subprojects: List[SubProject] =
       config
         .subProjectNames
-        .map { subProjectName => new SubProject(subProjectName, new File(subProjectName).getAbsoluteFile) }
+        .map { name => SubProject(baseDirectory = new File(name).getAbsoluteFile, name = name) }
 
     new Documenter(subprojects).publish()
   }

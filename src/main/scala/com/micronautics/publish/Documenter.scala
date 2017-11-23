@@ -22,16 +22,19 @@ class Documenter(val subProjects: List[SubProject])
 
   def publish(): Unit = {
     try {
-      setup()
+      subProjects.foreach(subProject => setup(project, subProject))
       gitPull()
       writeIndex(preserveIndex = config.preserveIndex)
 
       log.info(s"Making Scaladoc for ${ subProjects.size } SBT subprojects.")
-      subProjects.foreach(runScaladoc)
-
-      gitAddCommitPush(LogMessage(INFO, "Uploading Scaladoc to GitHub Pages"))
+      subProjects.foreach { implicit subProject =>
+        runScaladoc(subProject)
+        gitAddCommitPush(LogMessage(INFO, "Uploading Scaladoc to GitHub Pages"))
+      }
     } catch {
-      case e: Exception => log.error(e.getMessage)
+      case e: Exception =>
+        log.error(e.getMessage)
+        System.exit(0)
     }
     ()
   }
@@ -132,14 +135,16 @@ class Documenter(val subProjects: List[SubProject])
     * 3) Just retains the top 2 directories
     * 4) Creates new 3rd level directories to hold sbt subproject Scaladoc
     * 5) Commits the branch */
-  protected[publish] def setup()(implicit project: Project, subProject: SubProject): Unit = {
+  protected[publish] def setup(implicit project: Project, subProject: SubProject): Unit = {
     try {
       ghPages.clone(gitWorkPath)
       if (ghPages.ghPagesBranchExists) ghPages.deleteScaladoc()
       else ghPages.createGhPagesBranch()
       gitAddCommitPush()
     } catch {
-      case e: Exception => log.error(e.getMessage)
+      case e: Exception =>
+        log.error(e.getMessage)
+        System.exit(0)
     }
     ()
   }

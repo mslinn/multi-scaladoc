@@ -6,9 +6,10 @@ import java.io.File
   * @param gitRemoteOriginUrl taken from `.git/config`
   * @param version Git release version of this SBT project */
 case class Project(
-  override val name: String,
+  baseDirectory: File = new File(sys.props("user.dir")).getAbsoluteFile,
+  name: String,
   version: String
-) extends SubProject(name, new File(sys.props("user.dir")).getAbsoluteFile) {
+) {
   //require(io.Source.fromURL(gitRemoteOriginUrl).mkString.trim.nonEmpty, s"$gitRemoteOriginUrl does not exist")
 }
 
@@ -17,6 +18,6 @@ object ScalaCompiler {
   lazy val majorMinorVersion: String = fullVersion.split(".").take(2).mkString(".")
 }
 
-class SubProject(val name: String, val baseDirectory: File) {
+case class SubProject(baseDirectory: File, name: String) {
 //  lazy val crossTarget: File = new File(s"target/scala-${ ScalaCompiler.majorMinorVersion }")
 }
