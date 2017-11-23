@@ -44,17 +44,40 @@ The -j option forces a rebuild of the jar:
 Scaladoc publisher for multi-project SBT builds 0.1.0
 Usage: bin/run [options]
 
-  -c, --copyright <value>  Scaladoc footer
-  -h, --help               Display this help message
-  -k, --keepAfterUse       Keep the GhPages temporary directory when the program ends
-  -n, --gitHubName <value>
-                           Github project ID for project to be documented
-  -p, --preserveIndex      Preserve any pre-existing index.html in the Scaladoc root; if this option is not specified, the file is regenerated each time this program runs.
-  -r, --dryRun             Stubs out 'git commit' and displays the command line that would be run instead, along with the output of 'git status'
-  -s, --subProjectNames <value>
-                           Comma-delimited names of subprojects to generate Scaladoc for
-  -u, --gitRemoteOriginUrl <value>
-                           Github project url for project to be documented
+  -c <value> | --copyright <value>
+        Scaladoc footer. This command-line parameter overrides the SCALADOC_COPYRIGHT
+        environment variable.
+
+  -h | --help
+        Display this help message
+
+  -k | --keepAfterUse
+        Keep the scaladocXXXX temporary directory when the program ends. This
+        command-line parameter overrides the SCALADOC_KEEP environment variable.
+
+  -n <value> | --gitHubName <value>
+        Github project ID for project to be documented. This command-line parameter
+        overrides the SCALADOC_GITHUB_NAME environment variable.
+
+  -p | --preserveIndex
+        Preserve any pre-existing index.html in the Scaladoc root. If this option is
+        not specified, the file is regenerated each time this program runs. This
+        command-line parameter overrides the SCALADOC_PRESERVE_INDEX environment
+        variable.
+
+  -r | --dryRun
+        Stubs out 'git commit' and displays the command line that would be run instead,
+        along with the output of 'git status'.This command-line parameter
+        overrides the SCALADOC_DRYRUN environment variable.
+
+  -s <value> | --subProjectNames <value>
+        Comma-delimited names of subprojects to generate Scaladoc for. This
+        command-line parameter overrides the SCALADOC_SUB_PROJECT_NAMES
+        environment variable.
+
+  -u <value> | --gitRemoteOriginUrl <value>
+        Github project url for project to be documented. This command-line parameter
+        overrides the SCALADOC_GIT_URL environment variable.
 ```
 
 If you want to repetitively generate Scaladoc and view the results locally until you are satisfied that the Scaladoc meets your standards,
