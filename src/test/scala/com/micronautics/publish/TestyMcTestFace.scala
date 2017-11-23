@@ -2,7 +2,6 @@ package com.micronautics.publish
 
 import java.io.File
 import java.nio.file.{Files, Path}
-import buildInfo.BuildInfo
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest._
@@ -27,12 +26,6 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
   implicit protected [publish] val commandLine: CommandLine = new CommandLine
 
   lazy val gitHubUserUrl: String = commandLine.run("git config --get remote.origin.url")
-
-  implicit val project: Project =
-    Project(
-      name    = BuildInfo.gitRepoName,
-      version = BuildInfo.version
-    )
 
   // subprojects to document; others are ignored (such as this one)
   val subProjects: List[SubProject] =
@@ -100,7 +93,7 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
 
   "Setup" should {
     "work" in {
-      documenter.setup(project, subProjects.head)
+      documenter.setupSubProject(subProjects.head)
       val ghPagesRootFileNames: Array[String] = ghPages.ghPagesRoot.toFile.listFiles.map(_.getName)
       logger.info(s"ghPages.ghPagesRoot (${ ghPages.ghPagesRoot }) contains ${ ghPagesRootFileNames.mkString(", ") }")
       ghPagesRootFileNames mustBe Array("latest")
@@ -111,7 +104,7 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
 
   "RunScaladoc" should {
     "work" ignore { // fails under travis
-      subProjects.foreach(documenter.runScaladoc)
+      subProjects.foreach(documenter.createScaladocFor)
 
       ghPages.ghPagesRoot.resolve("latest/api/demo").toFile.listFiles.length must be > 0
       ghPages.ghPagesRoot.resolve("latest/api/root").toFile.listFiles.length must be > 0

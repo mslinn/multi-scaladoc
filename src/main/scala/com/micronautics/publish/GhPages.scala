@@ -50,7 +50,7 @@ case class GhPages(
 
   /** Clones the `gh-pages` branch into `ghPages/` */
   protected[publish] def clone(gitWorkPath: Path)
-                              (implicit commandLine: CommandLine, project: Project): Unit = {
+                              (implicit commandLine: CommandLine): Unit = {
     import commandLine.run
     config.gitRemoteOriginUrl.map { remoteUrl =>
       run(root, "git", "clone", "--depth", "1", "-b", ghPagesBranchName, remoteUrl, "ghPages")
@@ -59,7 +59,10 @@ case class GhPages(
     }.orElse(throw new Exception("Error: config.gitRemoteOriginUrl was not specified"))
   }
 
-  protected[publish] def createGhPagesBranch()(implicit commandLine: CommandLine, project: Project, subProject: SubProject): Unit = {
+  protected[publish] def createGhPagesBranch()(implicit
+    commandLine: CommandLine,
+    subProject: SubProject
+  ): Unit = {
     import commandLine.run
 
     config.gitRemoteOriginUrl.foreach { url =>

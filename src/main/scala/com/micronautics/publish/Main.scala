@@ -1,7 +1,6 @@
 package com.micronautics.publish
 
 import java.io.File
-import java.nio.file.Files
 import buildInfo.BuildInfo
 import org.slf4j.Logger
 
@@ -12,19 +11,14 @@ object Main extends App with OptionParsing {
   implicit val logger: Logger = org.slf4j.LoggerFactory.getLogger("pub")
 
   parser.parse(args, Config.default) match {
-     case Some(config) => doIt(config)
+     case Some(config) => main(config)
 
      case None =>
        // arguments are bad, error message will have been displayed
    }
 
-  def doIt(implicit config: Config): Unit = {
-    implicit val project: Project = Project(
-      name    = BuildInfo.name,
-      version = BuildInfo.version
-    )
-
-    // subprojects to document; others are ignored
+  def main(implicit config: Config): Unit = {
+    // subprojects to document; other subprojects are ignored
     val subProjects: List[SubProject] =
       config
         .subProjectNames
