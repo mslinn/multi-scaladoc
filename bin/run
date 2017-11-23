@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Edit these values to suit:
-export COPYRIGHT="Copyright 2017 Micronautics Research Corporation."
-export DRY_RUN="--dryRun"                   # comment this out for production
-export GITHUB_NAME="mslinn"    # replace this with your github user id
-export KEEP_AFTER="--keepAfterUse"          # comment this out for production
-#export PRESERVE_INDEX="--preserveIndex"
-export REMOTE_URL="git@github.com:mslinn/web3j-scala.git"  # Edit this to point to the SBT project on GitHub that you want to document
-export SUB_PROJECTS="root,demo"  # Edit this to include the SBT project names that you want to generate Scaladoc for
+export SCALADOC_COPYRIGHT="Copyright 2017 Micronautics Research Corporation."
+#export SCALADOC_DRYRUN="true"                 # comment this out for production
+export SCALADOC_GITHUB_NAME="mslinn"           # replace this with your github user id
+export SCALADOC_KEEP="true"                    # comment this out for production
+#export SCALADOC_PRESERVE_INDEX="true"
+export SCALADOC_GIT_URL="git@github.com:mslinn/web3j-scala.git"  # Edit this to point to the SBT project on GitHub that you want to document
+export SCALADOC_SUB_PROJECT_NAMES="root,demo"  # Edit this to include the SBT project names that you want to generate Scaladoc for
 # No need to modify anything below this line
 
 
@@ -16,7 +16,13 @@ function help {
 SBT and git must be installed for this script to work, and the generated Scaladoc will look better if graphviz is installed.
 To see the help information for this program, type:
     bin/run -h
-    
+
+The following environment variables can be used to provide configuration information to the program:
+SCALADOC_COPYRIGHT, SCALADOC_DRYRUN, SCALADOC_GITHUB_NAME, SCALADOC_KEEP, SCALADOC_PRESERVE_INDEX, SCALADOC_GIT_URL, SCALADOC_SUB_PROJECT_NAMES
+
+The following environment variables can be overridden by command-line parameters:
+SCALADOC_DRYRUN, SCALADOC_KEEP, SCALADOC_PRESERVE_INDEX
+
 To run this script in debug mode so a debugger can remotely attach to it, use the -d option:
     bin/run -d
 
@@ -36,7 +42,7 @@ cd "$DIR"
 
 while getopts ":hdSj" opt; do
   case ${opt} in
-    d) DEBUG="-jvm-debug 5005"
+    d) DEBUG="-J-Xdebug -J-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
        RUN_SBT=true
        shift
        ;;
@@ -83,18 +89,14 @@ function runFatJar {
   fi
 
   java -cp "$JAR" "$ENTRY" \
-    --copyright "$COPYRIGHT" \
     $DRY_RUN \
     $KEEP_AFTER \
-    --gitHubName "$GITHUB_NAME" \
     $PRESERVE_INDEX \
-    --gitRemoteOriginUrl "$REMOTE_URL" \
-    --subProjectNames "$SUB_PROJECTS" \
     "$@"
 }
 
 if [ "$RUN_SBT" ]; then
-  sbt $DEBUG "runMain $ENTRY --copyright "$COPYRIGHT" $DRY_RUN $KEEP_AFTER --gitHubName "$GITHUB_NAME" $PRESERVE_INDEX --gitRemoteOriginUrl "$REMOTE_URL" --subProjectNames "$SUB_PROJECTS" $*"
+  sbt $DEBUG "runMain $ENTRY $DRY_RUN $KEEP_AFTER $PRESERVE_INDEX $*"
 else
   runFatJar "$@"
 fi
