@@ -15,7 +15,7 @@ trait OptionParsing {
 
     opt[Unit]('k', "keepAfterUse").action { (_, config) =>
       config.copy(keepAfterUse = true)
-    }.text("Keep the GhPages temporary directory when the program ends")
+    }.text("Keep the scaladocXXXX temporary directory when the program ends")
 
     opt[String]('n', "gitHubName").action { (value, config) =>
       config.copy(gitHubName = Some(value))
@@ -23,7 +23,7 @@ trait OptionParsing {
 
     opt[Unit]('p', "preserveIndex").action { (_, config) =>
       config.copy(preserveIndex = true)
-    }.text(s"Preserve any pre-existing index.html in the Scaladoc root; if this option is not specified, the file is regenerated each time this program runs.")
+    }.text(s"Preserve any pre-existing index.html in the Scaladoc root. If this option is not specified, the file is regenerated each time this program runs.")
 
     opt[Unit]('r', "dryRun").action { (_, config) =>
       config.copy(dryRun = true)
