@@ -53,7 +53,7 @@ case class GhPages(
                               (implicit commandLine: CommandLine): Unit = {
     import commandLine.run
     config.gitRemoteOriginUrl.map { remoteUrl =>
-      run(root, "git", "clone", "--depth", "1", "-b", ghPagesBranchName, remoteUrl, "ghPages")
+      run(root.getParent, "git", "clone", "--depth", "1", "-b", ghPagesBranchName, remoteUrl, "ghPages")
       FileUtils.forceMkdir(apisRoot.toFile)
       ""
     }.orElse(throw new Exception("Error: config.gitRemoteOriginUrl was not specified"))

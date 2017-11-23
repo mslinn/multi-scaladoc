@@ -13,6 +13,8 @@ object Main extends App with OptionParsing {
      case Some(config) => main(config)
 
      case None =>
+       parser.showUsage()
+       System.exit(-1)
        // arguments are bad, error message will have been displayed
    }
 

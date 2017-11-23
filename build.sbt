@@ -112,4 +112,6 @@ scalacOptions in (Compile, console) --= Seq("-Ywarn-unused:imports", "-Xfatal-wa
 
 scalaVersion := "2.12.4"
 
+trapExit := false
+
 version := "0.1.0"
