@@ -11,9 +11,9 @@ case class Evaluation[From, +To](evaluate: (From) => To)
 object FSMLike {
   val uuidEmpty: UUID = new UUID(0L, 0L)
 
-//  val endState: Evaluation[Unit, FSMLike[Nothing]] = new Evaluation(() => FSMEmpty)
-//
-//  lazy val stop: FSMEntry[Unit, Unit, Nothing] = FSMEntry(uuidEmpty, Evaluation.default, endState)
+  val endState: Evaluation[Unit, FSMLike[Nothing]] = new Evaluation(_ => FSMEmpty)
+
+  lazy val stop: FSMEntry[Unit, Unit, Nothing] = FSMEntry(uuidEmpty, Evaluation.default, endState)
 
   def apply[From1, From2, To](
     action: Evaluation[From1, Unit],

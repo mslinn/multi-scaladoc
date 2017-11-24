@@ -7,17 +7,48 @@
 This program creates Scaladoc for SBT multi-projects hosted on GitHub.
 You must have write access to the GitHub project being documented.
 
-Output will be made available at your GhPages mini-site, in a subdirectory named after the GitHub project being documented.
+This program creates Scaladoc for the Scala code found in the `master` branch of your project.
+The resulting Scaladoc output is saved in the `gh-pages` branch, which is created if it does not already exist.
+Any other `git` branches in your project are ignored.
+
+Output will be made available at your GitHub Pages mini-site, in a subdirectory named after the GitHub project being documented.
+If you have never set up GitHub Pages before, no worries, this program does it for you automatically.
 For example, if your GitHub user id is `mslinn` and your project is called `web3j-scala`, Scaladoc output will be viewable at
 [mslinn.github.io/web3j-scala/index.html](http://mslinn.github.io/web3j-scala/index.html).
 Note that [GitHub pages do not support SSL certificates for custom subdomains](https://github.com/isaacs/github/issues/156).
 
 ## Before Running this Program
-The following is a recommended best practice; this program will work fine if you do not do this, 
-however your users will hate you for being sloppy.
+The following are a recommended best practices; this program will work fine if you do not follow these directions, 
+or a similar process, however your users will hate you for being sloppy.
 
+### Preflight Check: Optimize Your Scaladoc Source
+Create and proofread the Scaladoc output for the SBT project you wish to document.
+[Here](https://docs.scala-lang.org/overviews/scaladoc/for-library-authors.html) are the official Scaladoc instructions.
+
+1. Start by generating Scaladoc for one SBT subproject at a time.
+   For example, generate Scaladoc for subproject `a` by typing:
+   ```
+   $ sbt "; project a; doc"
+   ```
+   The above will only use the default options for Scaladoc generation, but that is ok for this preflight check.
+
+2. If the Scaladoc program issues errors and/or warnings, edit the source code to correct the issues, 
+   and regenerate the Scaladoc output as shown in the previous step.
+
+3. You can also generate Scaladoc for multiple SBT projects with one command.
+   For example, given an SBT project with 3 subprojects (`a`, `b` and `c`), 
+   you can generate the Scaladoc for all 3 SBT subprojects by typing:
+   ```
+   $ sbt "; project a; doc; project b; doc; project c; doc"
+   ```
+
+4. Once you have reduced or removed the errors and warnings,
+   view the Scaladoc located at `{a,b,c}/target/scala-2.12/api/index.html` in a web browser, 
+   and continue fussing with the Scaladoc source until you are satisfied with the result.
+
+### Update the Git Version String and Make a New Tag
 1. Ensure the version string in the target project's `build.sbt` is current before running this program.
-2. Commit changes with a descriptive comment and make a tag. 
+2. **Commit changes to the master branch** with a descriptive comment and make a tag. 
    Here is an example of how to do that from a bash prompt, for version 0.1.0 of your project:
    ```
    $ git add -A && \
@@ -25,9 +56,38 @@ however your users will hate you for being sloppy.
    git tag -a "0.1.0" -m "v0.1.0" && \
    git push origin master --tags
    ```
+3. If you are documenting a library you should release a version to correspond with the documentation that you are about to publish.
 
-### Running the Program
-Edit the `bin/run` script to suit your needs before running this program.
+## Running this Program
+1. Check it out to another directory.
+   In this example, this program is cloned into `~/scaladoc`:
+   ```
+   $ git clone https://github.com/mslinn/scaladoc.git ~/scaladoc
+   $ cd ~/scaladoc
+   ```
+2. Edit the settings in the `bin/run` script:
+   ```
+   # Edit these values to suit:
+   export SCALADOC_COPYRIGHT="Copyright 2017 Micronautics Research Corporation."
+   #export SCALADOC_DRYRUN="true"                 # comment this out for production
+   export SCALADOC_GITHUB_NAME="mslinn"           # replace this with your github user id
+   export SCALADOC_KEEP="true"                    # comment this out for production
+   #export SCALADOC_PRESERVE_INDEX="true"         
+   export SCALADOC_GIT_URL="git@github.com:mslinn/web3j-scala.git"  # Edit this to point to the SBT project on GitHub that you want to document
+   export SCALADOC_SUB_PROJECT_NAMES="root,demo"  # Edit this to include the SBT project names that you want to generate Scaladoc for
+   # No need to modify anything below this line
+   ```
+3. Run this program:
+   ```
+   $ bin/run
+   ```
+4. View the results in your GitHub pages.
+   For example, the URL for GitHub user `mslinn` and GitHub project `web3j-scala` is 
+   [http://mslinn.github.io/web3j-scala](http://mslinn.github.io/web3j-scala).
+
+You are done!
+
+### Getting Help
 
 For help information, simply type `bin/run -h`:
 ```
@@ -82,11 +142,6 @@ Usage: bin/run [options]
         Github project url for project to be documented. This command-line parameter
         overrides the SCALADOC_GIT_URL environment variable.
 ```
-
-If you want to repetitively generate Scaladoc and view the results locally until you are satisfied that the Scaladoc meets your standards,
-and only then commit to GitHub pages, 
-specify both the `--dryRun` and `--keepAfterUse` flags.
-If you do this, you will eventually have to delete the temporary directory manually.
 
 ## How It Works
 The system's temporary directory is used for all steps; for Mac, Linux and Windows Subsystem for Linux this is often `/tmp`.
