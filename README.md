@@ -25,7 +25,11 @@ or a similar process, however your users will hate you for being sloppy.
 Create and proofread the Scaladoc output for the SBT project you wish to document.
 [Here](https://docs.scala-lang.org/overviews/scaladoc/for-library-authors.html) are the official Scaladoc instructions.
 
-1. Start by generating Scaladoc for one SBT subproject at a time.
+1. Work in the `master` branch of the project that you want to generate Scaladoc for:
+   ```
+   $ git checkout master
+   ```
+1. Generate Scaladoc for one SBT subproject at a time.
    For example, generate Scaladoc for subproject `a` by typing:
    ```
    $ sbt "; project a; doc"
@@ -56,7 +60,8 @@ Create and proofread the Scaladoc output for the SBT project you wish to documen
    git tag -a "0.1.0" -m "v0.1.0" && \
    git push origin master --tags
    ```
-3. If you are documenting a library you should release a version to correspond with the documentation that you are about to publish.
+3. If you are documenting a library you should release a version to correspond with the documentation that you are about 
+   to publish. Details vary considerably depending on your infrastructure.
 
 ## Running this Program
 1. Check it out to another directory.
