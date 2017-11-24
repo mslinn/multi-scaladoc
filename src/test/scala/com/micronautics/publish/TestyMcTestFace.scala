@@ -27,20 +27,14 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
 
   lazy val gitHubUserUrl: String = commandLine.run("git config --get remote.origin.url")
 
-  // subprojects to document; others are ignored (such as this one)
-  val subProjects: List[SubProject] =
-    List("root", "demo")
-      .map(name => SubProject(new File(name).getAbsoluteFile, name))
-
   val documenter = new Documenter(
-    root = Documenter.temporaryDirectory,
-    subProjects = subProjects
+    root = Documenter.temporaryDirectory
   )
   val ghPages: GhPages = documenter.ghPages
 
   "Nuke" should {
     "work" in {
-      val root: Path = Files.createTempDirectory("ghPages")
+      val root: Path = Files.createTempDirectory("scaladocTest")
 
       val abc: File = root.resolve("a/b/c").toFile
       abc.mkdirs
@@ -66,14 +60,13 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
 
   "GhPages subprojects" should {
     "work" in {
-      ghPages.apisRoot mustBe ghPages.ghPagesRoot.resolve("latest/api")
-      subProjects.find(_.name=="root").map(ghPages.apiRootFor).value mustBe ghPages.ghPagesRoot.resolve("latest/api/root")
+      ghPages.apisLatestDir mustBe ghPages.root.resolve("latest/api")
     }
   }
 
   "GhPages branch creation" should {
     "work" ignore { // todo currently tests with a live project, need a dummy project for testing
-      val root: Path = Files.createTempDirectory("ghPages")
+      val root: Path = Files.createTempDirectory("scaladocTest")
       val ghPagesDir = new File(root.toFile, "ghPages")
       val ghPagesBranchName = "gh-pages"
       config.gitRemoteOriginUrl.foreach { url =>
@@ -93,21 +86,21 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
 
   "Setup" should {
     "work" in {
-      documenter.setupSubProject(subProjects.head)
-      val ghPagesRootFileNames: Array[String] = ghPages.ghPagesRoot.toFile.listFiles.map(_.getName)
-      logger.info(s"ghPages.ghPagesRoot (${ ghPages.ghPagesRoot }) contains ${ ghPagesRootFileNames.mkString(", ") }")
+      documenter.setupSubProject(documenter.subProjects.head)
+      val ghPagesRootFileNames: Array[String] = ghPages.root.toFile.listFiles.map(_.getName)
+      logger.info(s"ghPages.ghPagesRoot (${ ghPages.root }) contains ${ ghPagesRootFileNames.mkString(", ") }")
       ghPagesRootFileNames mustBe Array("latest")
       ghPages.deleteScaladoc()
-      ghPages.ghPagesRoot.resolve("latest/api").toFile.listFiles.length mustBe 0
+      ghPages.root.resolve("latest/api").toFile.listFiles.length mustBe 0
     }
   }
 
   "RunScaladoc" should {
     "work" ignore { // fails under travis
-      subProjects.foreach(documenter.createScaladocFor)
+      documenter.subProjects.foreach(documenter.createScaladocFor)
 
-      ghPages.ghPagesRoot.resolve("latest/api/demo").toFile.listFiles.length must be > 0
-      ghPages.ghPagesRoot.resolve("latest/api/root").toFile.listFiles.length must be > 0
+      ghPages.root.resolve("latest/api/demo").toFile.listFiles.length must be > 0
+      ghPages.root.resolve("latest/api/root").toFile.listFiles.length must be > 0
 
       /*import java.awt.Desktop
       import java.net.URI

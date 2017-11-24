@@ -9,23 +9,27 @@ import org.slf4j.event.Level._
 import FSMLike._
 
 object Documenter {
-  @inline def file(name: String): File = new File(name)
-
   implicit val log: org.slf4j.Logger = org.slf4j.LoggerFactory.getLogger("pub")
 
-  @inline def temporaryDirectory: Path = Files.createTempDirectory("scaladoc").toAbsolutePath
+  val rootDir: Path = Documenter.temporaryDirectory
 
   val states: Map[UUID, FSMLike[_]] =
     List(
 //      (stop.id, stop)
     ).toMap
 
-  val fsm = FiniteStateMachine(states)
+  lazy val fsm = FiniteStateMachine(states)
+
+
+  @inline def file(name: String): File = new File(name)
+
+  def apisLatestDir(ghPagesDir: Path): Path = ghPagesDir.resolve("latest/api/")
+
+  @inline def temporaryDirectory: Path = Files.createTempDirectory("scaladoc")
 }
 
 case class Documenter(
-  root: Path,
-  subProjects: List[SubProject]
+  root: Path
 )(implicit
   commandLine: CommandLine,
   config: Config
@@ -51,7 +55,19 @@ case class Documenter(
     last.substring(0, last.indexOf(".git"))
   }.mkString
 
-  lazy val version: String = run(masterDir, "sbt", "-no-colors", "show version").split("\n").last.split(" ").last
+  lazy val version: String =
+    run(masterDir, "sbt", "-no-colors", "show version")
+      .split("\n")
+      .last
+      .split(" ")
+      .last
+
+  // subprojects to document; other subprojects are ignored
+  lazy val subProjects: List[SubProject] =
+    config
+      .subProjectNames
+      .map { name => SubProject(baseDirectory = apisLatestDir(ghPages.root).resolve(name).toFile, name = name) }
+
 
   def publish(): Unit = {
     try {
@@ -76,7 +92,7 @@ case class Documenter(
   protected[publish] def createScaladocFor(subProject: SubProject): Unit = {
     log.info(s"Creating Scaladoc for ${ subProject.name }.")
 
-    val outputDirectory: Path = ghPages.apiRootFor(subProject)
+    val outputDirectory: Path = ghPages.apiDirFor(subProject)
 
     val classPath: String =
       run(masterDir, "sbt", "-no-colors", s"; project ${ subProject.name }; export runtime:fullClasspath")
@@ -102,7 +118,7 @@ case class Documenter(
 
   protected[publish] def gitAddCommitPush(message: LogMessage = LogMessage.empty)
                                          (implicit subProject: SubProject): Unit = {
-    FileUtils.forceMkdir(ghPages.apiRootFor(subProject).toFile)
+    FileUtils.forceMkdir(ghPages.apiDirFor(subProject).toFile)
     run(ghPages.root, "git add --all")(message, log)
     run(ghPages.root, "git commit -m -")
     run(ghPages.root, "git push origin HEAD")
@@ -115,7 +131,8 @@ case class Documenter(
     * 5) Commits the branch */
   protected[publish] def setupSubProject(implicit subProject: SubProject): Unit = {
     try {
-      ghPages.clone(ghPages.apiRootFor(subProject))
+      val ghSubDir = ghPages.apiDirFor(subProject)
+      ghPages.clone(ghSubDir)
       if (ghPages.ghPagesBranchExists) ghPages.deleteScaladoc()
       else ghPages.createGhPagesBranch()
       gitAddCommitPush()
@@ -128,7 +145,7 @@ case class Documenter(
   }
 
   protected def writeIndex(preserveIndex: Boolean = false): Unit = {
-    val ghFile = ghPages.ghPagesRoot.toFile
+    val ghFile = ghPages.root.toFile
     if (!preserveIndex || ghFile.list.isEmpty) {
       val index: File = new File(ghFile, "index.html")
       val contents: String = subProjects.map { subProject =>

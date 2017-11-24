@@ -20,15 +20,10 @@ object Main extends App with OptionParsing {
    }
 
   def main(implicit config: Config): Unit = {
-    // subprojects to document; other subprojects are ignored
-    val subProjects: List[SubProject] =
-      config
-        .subProjectNames
-        .map { name => SubProject(baseDirectory = new File(name).getAbsoluteFile, name = name) }
+    import Documenter._
 
     new Documenter(
-      root = Documenter.temporaryDirectory,
-      subProjects = subProjects
+      root = rootDir
     ).publish()
   }
 }

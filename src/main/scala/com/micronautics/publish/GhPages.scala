@@ -20,29 +20,20 @@ case class GhPages(
     })
 
   /** Create common root for Scaladoc for every SBT sub-project, and return the [[Path]] */
-  protected[publish] lazy val apisRoot: Path = {
-    val dir = ghPagesRoot.resolve("latest/api/").toAbsolutePath
-//    FileUtils.forceMkdir(dir.toFile)
-    dir
-  }
+  protected[publish] lazy val apisLatestDir: Path = Documenter.apisLatestDir(root)
 
-  /** @return the [[Path]] for the `gh-pages` branch */
-  @inline protected[publish] lazy val ghPagesRoot: Path = {
-    val dir = root.resolve("ghPages").toAbsolutePath
-//    FileUtils.forceMkdir(dir.toFile)
-    dir
-  }
 
-  /** Root for Scaladoc for the given SBT sub-project; does not create the [[Path]];
+  /** Directory root to hold Scaladoc for the given SBT sub-project; does not create the [[Path]];
     * this is done when the Scaladoc is generated. */
-  @inline protected[publish] def apiRootFor(subProject: SubProject): Path = apisRoot.resolve(subProject.name).toAbsolutePath
+  @inline protected[publish] def apiDirFor(subProject: SubProject): Path =
+    apisLatestDir.resolve(subProject.name)
 
   @inline protected[publish] def branchExistsLocally(branchName: String = ghPagesBranchName)
-                         (implicit commandLine: CommandLine): Boolean =
-    commandLine.run(ghPagesRoot, "git", "show-ref", s"refs/heads/$branchName").nonEmpty
+                                                    (implicit commandLine: CommandLine): Boolean =
+    commandLine.run(root, "git", "show-ref", s"refs/heads/$branchName").nonEmpty
 
   @inline protected[publish] def branchExistsRemotely(branchName: String = ghPagesBranchName)
-                          (implicit commandLine: CommandLine): Boolean =
+                                                     (implicit commandLine: CommandLine): Boolean =
     commandLine
       .run(root, "git", "rev-parse", "--verify", "--no-color", branchName)
       .split(",")
@@ -54,7 +45,7 @@ case class GhPages(
     import commandLine.run
     config.gitRemoteOriginUrl.map { remoteUrl =>
       run(root.getParent, "git", "clone", "--depth", "1", "-b", ghPagesBranchName, remoteUrl, "ghPages")
-      FileUtils.forceMkdir(apisRoot.toFile)
+      FileUtils.forceMkdir(apisLatestDir.toFile)
       ""
     }.orElse(throw new Exception("Error: config.gitRemoteOriginUrl was not specified"))
   }
@@ -66,22 +57,22 @@ case class GhPages(
     import commandLine.run
 
     config.gitRemoteOriginUrl.foreach { url =>
-      run(root, "git", "clone", url, ghPagesRoot.toFile.getName) // todo try "--depth", "1",
+      run(root, "git", "clone", url, root.toFile.getName) // todo try "--depth", "1",
     }
 
     // Remove git history and content
-    run(ghPagesRoot, "git", "checkout", "--orphan", ghPagesBranchName)
-    Nuke.removeUnder(ghPagesRoot)
+    run(root, "git", "checkout", "--orphan", ghPagesBranchName)
+    Nuke.removeUnder(root)
 
     // Create the gh-pages branch and push it
-    run(ghPagesRoot, "git", "commit", "--allow-empty", "-m", s"Initialize $ghPagesBranchName branch")
-    run(ghPagesRoot, "git", "push", "origin", ghPagesBranchName)
+    run(root, "git", "commit", "--allow-empty", "-m", s"Initialize $ghPagesBranchName branch")
+    run(root, "git", "push", "origin", ghPagesBranchName)
 
-    Nuke.remove(ghPagesRoot) // All done
+    Nuke.remove(root) // All done
   }
 
   /** Delete any previous Scaladoc while keeping top 3 directories (does not mess with top-level contents). */
-  @inline protected[publish] def deleteScaladoc(): Unit = Nuke.removeUnder(apisRoot)
+  @inline protected[publish] def deleteScaladoc(): Unit = Nuke.removeUnder(apisLatestDir)
 
   @inline protected[publish] def deleteTempDir(): Unit =
     try {
@@ -94,7 +85,7 @@ case class GhPages(
     import commandLine.run
     branchExistsLocally(ghPagesBranchName) || {
       if (branchExistsRemotely(ghPagesBranchName)) {
-        run(ghPagesRoot, "git", "checkout", "--track", s"origin/$ghPagesBranchName")
+        run(root, "git", "checkout", "--track", s"origin/$ghPagesBranchName")
         branchExistsLocally(ghPagesBranchName)
       } else false
     }
