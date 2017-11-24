@@ -96,7 +96,7 @@ function runFatJar {
 }
 
 if [ "$RUN_SBT" ]; then
-  sbt $DEBUG "runMain $ENTRY $DRY_RUN $KEEP_AFTER $PRESERVE_INDEX $*"
+  sbt --error $DEBUG "runMain $ENTRY $DRY_RUN $KEEP_AFTER $PRESERVE_INDEX $*"
 else
   runFatJar "$@"
 fi
