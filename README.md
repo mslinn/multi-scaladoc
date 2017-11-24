@@ -17,6 +17,19 @@ For example, if your GitHub user id is `mslinn` and your project is called `web3
 [mslinn.github.io/web3j-scala/index.html](http://mslinn.github.io/web3j-scala/index.html).
 Note that [GitHub pages do not support SSL certificates for custom subdomains](https://github.com/isaacs/github/issues/156).
 
+## Scaladoc Output Features
+This program takes advantage of several important Scaladoc features that are not used by default:
+
+1. Links well-known Scala types to other online Scaladoc.
+2. Creates inheritance diagrams.
+3. Deprecation warnings are included.
+4. The publishing address of the generated Scaladoc is embedded in the generated output.
+5. The Lightbend copyright is not generated at the bottom of every Scaladoc HTML page; 
+   instead, a custom footer can be specified.
+6. The SBT project name and version is used as the title of the generated Scaladoc.
+7. Members inherited by implicit conversions are documented.
+8. Verbosity is controllable.
+
 ## Before Running this Program
 The following are a recommended best practices; this program will work fine if you do not follow these directions, 
 or a similar process, however your users will hate you for being sloppy.
