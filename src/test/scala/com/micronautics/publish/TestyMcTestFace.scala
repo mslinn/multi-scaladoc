@@ -58,6 +58,23 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
     }
   }
 
+  "SBT" should {
+    "cooperate" in {
+      val cwd = new java.io.File(sys.props("user.dir"))
+      val subProjectsFound =
+        commandLine
+          .run(cwd, "sbt.bat projects")
+          .split("In file:")
+          .last
+          .replace("[info] \t *", "")
+          .split("\n")
+          .tail
+          .map(_.trim)
+          .mkString(", ")
+      subProjectsFound mustBe "root"
+    }
+  }
+
   "GhPages subprojects" should {
     "work" in {
       ghPages.apisLatestDir mustBe ghPages.root.resolve("latest/api")
@@ -89,7 +106,7 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
       ghPages.setupGhPages()
       val ghPagesRootFileNames: Array[String] = ghPages.root.toFile.listFiles.map(_.getName)
       logger.info(s"ghPages.ghPagesRoot (${ ghPages.root }) contains ${ ghPagesRootFileNames.mkString(", ") }")
-      ghPagesRootFileNames mustBe Array("latest")
+      assert(ghPagesRootFileNames.contains("latest"))
       ghPages.deleteScaladoc()
       ghPages.root.resolve("latest/api").toFile.listFiles.length mustBe 0
     }

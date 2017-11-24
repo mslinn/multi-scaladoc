@@ -7,6 +7,7 @@ import java.util.UUID
 import org.apache.commons.io.FileUtils
 import org.slf4j.event.Level._
 import FSMLike._
+import scala.collection.JavaConverters._
 
 object Documenter {
   implicit val log: org.slf4j.Logger = org.slf4j.LoggerFactory.getLogger("pub")
@@ -73,7 +74,21 @@ case class Documenter(
           srcDir = masterDir.resolve(name).toFile
         )
         if (!subProject.srcDirExists) {
-          Console.err.println(s"Error: ${ subProject.srcDir } does not exist. Are you sure that an SBT subproject called '$name' actually exists in this project?")
+          Console.err.println(
+            s"""Error: ${ subProject.srcDir.getAbsolutePath } does not exist.
+               |Are you sure that an SBT subproject called '$name' actually exists in this project?
+               |Gathering the list of available SBT subprojects in project $name...
+               |""".stripMargin)
+            val subProjectsFound =
+              run(masterDir, "sbt.bat projects")
+                .split("In file:")
+                .last
+                .replace("[info] \t *", "")
+                .split("\n")
+                .tail
+                .map(_.trim)
+                .mkString(", ")
+          Console.err.println(s"Found these subprojects: $subProjectsFound")
           System.exit(-2)
         }
         subProject
