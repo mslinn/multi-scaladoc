@@ -31,6 +31,4 @@ object Main extends App with OptionParsing {
       subProjects = subProjects
     ).publish()
   }
-
-//  lazy val gitRemoteOriginUrl: String = commandLine.run("git config --get remote.origin.url")
 }

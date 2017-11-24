@@ -3,8 +3,10 @@ package com.micronautics.publish
 import java.io.File
 import java.nio.charset.Charset
 import java.nio.file.{Files, Path}
+import java.util.UUID
 import org.apache.commons.io.FileUtils
 import org.slf4j.event.Level._
+import FSMLike._
 
 object Documenter {
   @inline def file(name: String): File = new File(name)
@@ -12,6 +14,13 @@ object Documenter {
   implicit val log: org.slf4j.Logger = org.slf4j.LoggerFactory.getLogger("pub")
 
   @inline def temporaryDirectory: Path = Files.createTempDirectory("scaladoc").toAbsolutePath
+
+  val states: Map[UUID, FSMLike[_]] =
+    List(
+      (stop.id, stop)
+    ).toMap
+
+  val fsm = FiniteStateMachine(states)
 }
 
 case class Documenter(
