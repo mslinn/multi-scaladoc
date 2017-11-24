@@ -7,6 +7,10 @@
 This program creates Scaladoc for SBT multi-projects hosted on GitHub.
 You must have write access to the GitHub project being documented.
 
+This program has been tested with Scala 2.12, SBT 0.13.16 and SBT 1.0.3.
+Earlier versions of Scala and SBT should also be compatible.
+The appearance of the generated Scaladoc depends on the version of Scala installed on the machine that runs this program.
+
 This program creates Scaladoc for the Scala code found in the `master` branch of your project.
 The resulting Scaladoc output is saved in the `gh-pages` branch, which is created if it does not already exist.
 Any other `git` branches in your project are ignored.
