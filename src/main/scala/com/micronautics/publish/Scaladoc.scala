@@ -84,6 +84,10 @@ case class Scaladoc(
     import scala.collection.JavaConverters._
     import org.apache.commons.io.FileUtils.listFiles
 
+    if (!sourcePath.exists) {
+      Console.err.println(s"Error: $sourcePath does not exist.")
+      System.exit(-1)
+    }
     listFiles(sourcePath, Array("scala"), true)
       .asScala
       .toList

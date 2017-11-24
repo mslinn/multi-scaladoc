@@ -62,16 +62,21 @@ case class Documenter(
       .split(" ")
       .last
 
-  // subprojects to document; other subprojects are ignored
+  // Subprojects to document; other subprojects are ignored
   lazy val subProjects: List[SubProject] =
     config
       .subProjectNames
       .map { name =>
-        SubProject(
+        val subProject = SubProject(
           apiDir = apisLatestDir(ghPages.root).resolve(name).toFile,
           name = name,
           srcDir = masterDir.resolve(name).toFile
         )
+        if (!subProject.srcDirExists) {
+          Console.err.println(s"Error: ${ subProject.srcDir } does not exist. Did you specify an SBT subproject that does not exist?")
+          System.exit(-2)
+        }
+        subProject
       }
 
   def publish(): Unit = {

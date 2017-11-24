@@ -7,4 +7,8 @@ object ScalaCompiler {
   lazy val majorMinorVersion: String = fullVersion.split(".").take(2).mkString(".")
 }
 
-case class SubProject(apiDir: File, name: String, srcDir: File)
+case class SubProject(apiDir: File, name: String, srcDir: File) {
+  def apiDirExists: Boolean = apiDir.exists
+
+  def srcDirExists: Boolean = srcDir.exists
+}
