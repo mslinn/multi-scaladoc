@@ -73,7 +73,7 @@ case class Documenter(
           srcDir = masterDir.resolve(name).toFile
         )
         if (!subProject.srcDirExists) {
-          Console.err.println(s"Error: ${ subProject.srcDir } does not exist. Did you specify an SBT subproject that does not exist?")
+          Console.err.println(s"Error: ${ subProject.srcDir } does not exist. Are you sure that an SBT subproject called '$name' actually exists in this project?")
           System.exit(-2)
         }
         subProject
