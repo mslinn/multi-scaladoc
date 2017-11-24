@@ -71,7 +71,7 @@ case class Documenter(
 
   def publish(): Unit = {
     try {
-      subProjects.foreach(subProject => setupSubProject(subProject))
+      ghPages.setupGhPages()
       writeIndex(preserveIndex = config.preserveIndex)
 
       log.info(s"Making Scaladoc for ${ subProjects.size } SBT subprojects.")
@@ -122,26 +122,6 @@ case class Documenter(
     run(ghPages.root, "git add --all")(message, log)
     run(ghPages.root, "git commit -m -")
     run(ghPages.root, "git push origin HEAD")
-  }
-
-  /** 1) Fetches or creates gh-pages branch if it is not already local
-    * 2) Creates any directories that might be needed
-    * 3) Just retains the top 2 directories
-    * 4) Creates new 3rd level directories to hold sbt subproject Scaladoc
-    * 5) Commits the branch */
-  protected[publish] def setupSubProject(implicit subProject: SubProject): Unit = {
-    try {
-      val ghSubDir = ghPages.apiDirFor(subProject)
-      ghPages.clone(ghSubDir)
-      if (ghPages.ghPagesBranchExists) ghPages.deleteScaladoc()
-      else ghPages.createGhPagesBranch()
-      gitAddCommitPush()
-    } catch {
-      case e: Exception =>
-        log.error(e.getMessage)
-        System.exit(0)
-    }
-    ()
   }
 
   protected def writeIndex(preserveIndex: Boolean = false): Unit = {

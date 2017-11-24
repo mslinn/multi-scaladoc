@@ -86,7 +86,7 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
 
   "Setup" should {
     "work" in {
-      documenter.setupSubProject(documenter.subProjects.head)
+      ghPages.setupGhPages()
       val ghPagesRootFileNames: Array[String] = ghPages.root.toFile.listFiles.map(_.getName)
       logger.info(s"ghPages.ghPagesRoot (${ ghPages.root }) contains ${ ghPagesRootFileNames.mkString(", ") }")
       ghPagesRootFileNames mustBe Array("latest")

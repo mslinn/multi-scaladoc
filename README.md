@@ -99,7 +99,7 @@ Following is a high-level description of what this program does for the SBT proj
 3. If the `gh-pages` branch of the Git project exists, 
    it is cloned into the `ghPages` directory under the temporary directory and any existing Scaladoc for SBT subprojects is deleted, 
    otherwise the `gh-pages` branch is created in the `ghPages` directory under the temporary directory.
-4. Scaladoc for each SBT subproject is built from the `master` branch source, 
+4. Scaladoc for each SBT sub-project is built from the `master` branch source, 
    and the Scaladoc output is written into subdirectories named after the SBT subprojects under the `ghPages` directory.
 5. An index page is created in the `ghPages` directory, unless one had previously been built and the `--preserveIndex` switch was specified.
 6. The `gh-pages` branch in the `ghPages` directory is committed; this includes all of the Scaladoc and `index.html`.
@@ -109,14 +109,16 @@ The following directory structure is temporarily created while the program runs.
 ```
 /tmp/
   scaladocXXXX/          # A unique name is generated for this temporary directory each time this program runs
-    ghPages/             # Git project checked out as gh-pages branch; an empty branch is created if non-existant
-      index.html         # created if it does not already exist
-      api/               # created if it does not already exist
-        latest/          # created if it does not already exist; contents wiped before generating Scaladoc
+    ghPages/             # Git project; an empty branch is created if non-existant
+      .git/              # Checked out as gh-pages branch
+      latest/            # created if it does not already exist
+        api/             # created if it does not already exist; contents wiped before generating Scaladoc
            subProject1/  # Scaladoc for SBT subProject1 is generated here
            subProject2/  # Scaladoc for SBT subProject2 is generated here
            subProject3/  # Scaladoc for SBT subProject3 is generated here
-    master/              # Git project checked out as master branch (not modified, just read)
+      index.html         # created if it does not already exist
+    master/              # Git project (not modified, just read)
+      .git/              # Checked out as master branch 
       subProject1/       # SBT subProject1 source
       subProject2/       # SBT subProject1 source
       subProject3/       # SBT subProject1 source

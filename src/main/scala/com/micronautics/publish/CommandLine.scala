@@ -32,6 +32,8 @@ class CommandLine(implicit config: Config = Config.default) {
   import scala.sys.process._
   import scala.util.Properties.isWin
 
+  var lastResult = ""
+
   protected val cmdNameCache =
     mutable.HashMap(
       "git"      -> which("git", useCache=false),
@@ -56,11 +58,12 @@ class CommandLine(implicit config: Config = Config.default) {
     val command: List[String] = whichOrThrow(tokens(0)).toString :: tokens.tail.toList
     if (logMessage.nonEmpty) logMessage.display()
     log.debug(s"# Running $cmd from '$cwd'") //, which translates to ${ command.mkString("\"", "\", \"", "\"") }")
-    if (config.dryRun && (tokens.take(2) sameElements Array(which("git"), "commit"))) {
+    lastResult = if (config.dryRun && (tokens.take(2) sameElements Array(which("git"), "commit"))) {
       log.debug("# " + command.mkString(" "))
       run(cwd, "git status")
     } else
       Process(command=command, cwd=cwd).!!.trim
+    lastResult
   }
 
 
@@ -69,11 +72,12 @@ class CommandLine(implicit config: Config = Config.default) {
     val command: List[String] = whichOrThrow(cmd(0)).toString :: cmd.tail.toList
     if (logMessage.nonEmpty) logMessage.display()
     log.debug(s"Running ${ cmd.mkString(" ") } from '$cwd'")
-    if (config.dryRun && (cmd.take(2) == Seq(which("git"), "commit"))) {
+    lastResult = if (config.dryRun && (cmd.take(2) == Seq(which("git"), "commit"))) {
       log.debug(s"# $cmd")
       run(cwd, "git", "status")
     } else
       Process(command=command, cwd=cwd).!!.trim
+    lastResult
   }
 
 

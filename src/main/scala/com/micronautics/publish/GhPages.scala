@@ -1,6 +1,7 @@
 package com.micronautics.publish
 
 import java.nio.file.Path
+import com.micronautics.publish.Documenter.log
 import org.apache.commons.io.FileUtils
 import org.slf4j.Logger
 
@@ -40,19 +41,17 @@ case class GhPages(
       .contains(ghPagesBranchName)
 
   /** Clones the `gh-pages` branch into `ghPages/` */
-  protected[publish] def clone(gitWorkPath: Path)
-                              (implicit commandLine: CommandLine): Unit = {
+  protected[publish] def gitClone()(implicit commandLine: CommandLine): Unit = {
     import commandLine.run
     config.gitRemoteOriginUrl.map { remoteUrl =>
       run(root.getParent, "git", "clone", "--depth", "1", "-b", ghPagesBranchName, remoteUrl, "ghPages")
       FileUtils.forceMkdir(apisLatestDir.toFile)
-      ""
+      commandLine.lastResult
     }.orElse(throw new Exception("Error: config.gitRemoteOriginUrl was not specified"))
   }
 
   protected[publish] def createGhPagesBranch()(implicit
-    commandLine: CommandLine,
-    subProject: SubProject
+    commandLine: CommandLine
   ): Unit = {
     import commandLine.run
 
@@ -89,5 +88,22 @@ case class GhPages(
         branchExistsLocally(ghPagesBranchName)
       } else false
     }
+  }
+
+  /** 1) Fetches or creates gh-pages branch if it is not already local
+    * 2) Creates any directories that might be needed
+    * 3) Just retains ghPages/latest/api
+    * 4) Creates new 3rd level directories to hold sbt subproject Scaladoc  */
+  protected[publish] def setupGhPages()(implicit commandLine: CommandLine): Unit = {
+    try {
+      gitClone()
+      if (ghPagesBranchExists) deleteScaladoc()
+      else createGhPagesBranch()
+    } catch {
+      case e: Exception =>
+        log.error(e.getMessage)
+        System.exit(0)
+    }
+    ()
   }
 }
