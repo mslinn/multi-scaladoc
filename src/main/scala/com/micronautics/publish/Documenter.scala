@@ -17,7 +17,7 @@ object Documenter {
 
   val states: Map[UUID, FSMLike[_]] =
     List(
-      (stop.id, stop)
+//      (stop.id, stop)
     ).toMap
 
   val fsm = FiniteStateMachine(states)
