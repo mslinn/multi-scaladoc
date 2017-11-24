@@ -42,7 +42,7 @@ case class Scaladoc(
   title: String = "",
   verbose: Boolean = false,
   version: String = ""
-) {
+)(implicit subProject: SubProject) {
   import Documenter._
 
   @inline protected def option(name: String, value: String): List[String] =
@@ -74,20 +74,19 @@ case class Scaladoc(
       option("-sourcepath",       sourcePath) :::
       option("-verbose",          verbose)
 
-    val sourceFiles: List[String] = scalaFilesUnder(Paths.get(sourcePath))
+    val sourceFiles: List[String] = scalaFilesUnder(subProject.srcDir)
     val command = "scaladoc" :: options ::: sourceFiles
     commandLine.run(cwd, command: _*)
   }
 
   /** @return relativized list of scala file names under `sourcePath`, including `sourcePath` */
-  def scalaFilesUnder(sourcePath: Path): List[String] = {
+  def scalaFilesUnder(sourcePath: File): List[String] = {
     import scala.collection.JavaConverters._
     import org.apache.commons.io.FileUtils.listFiles
 
-    val parent: Path = sourcePath.getParent.getParent.getParent
-    listFiles(sourcePath.toFile, Array("scala"), true)
+    listFiles(sourcePath, Array("scala"), true)
       .asScala
       .toList
-      .map(x => parent.relativize(x.toPath).toString)
+      .map(x => sourcePath.toPath.relativize(x.toPath).toString)
   }
 }

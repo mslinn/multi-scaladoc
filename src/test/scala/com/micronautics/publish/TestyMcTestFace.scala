@@ -97,7 +97,7 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
 
   "RunScaladoc" should {
     "work" ignore { // fails under travis
-      documenter.subProjects.foreach(documenter.createScaladocFor)
+      documenter.subProjects.foreach(x => documenter.createScaladocFor(x))
 
       ghPages.root.resolve("latest/api/demo").toFile.listFiles.length must be > 0
       ghPages.root.resolve("latest/api/root").toFile.listFiles.length must be > 0

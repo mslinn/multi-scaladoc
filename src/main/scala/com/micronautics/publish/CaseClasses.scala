@@ -7,4 +7,4 @@ object ScalaCompiler {
   lazy val majorMinorVersion: String = fullVersion.split(".").take(2).mkString(".")
 }
 
-case class SubProject(baseDirectory: File, name: String)
+case class SubProject(apiDir: File, name: String, srcDir: File)

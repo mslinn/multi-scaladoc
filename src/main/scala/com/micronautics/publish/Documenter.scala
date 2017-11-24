@@ -45,7 +45,7 @@ case class Documenter(
     ""
   }
 
-  protected[publish] lazy val ghPages: GhPages = GhPages(root.resolve("ghPages"))
+  protected[publish] implicit lazy val ghPages: GhPages = GhPages(root.resolve("ghPages"))
 
   /** Path where the master branch of the project is cloned into */
   protected[publish] lazy val masterDir: Path = root.resolve("master")
@@ -66,8 +66,13 @@ case class Documenter(
   lazy val subProjects: List[SubProject] =
     config
       .subProjectNames
-      .map { name => SubProject(baseDirectory = apisLatestDir(ghPages.root).resolve(name).toFile, name = name) }
-
+      .map { name =>
+        SubProject(
+          apiDir = apisLatestDir(ghPages.root).resolve(name).toFile,
+          name = name,
+          srcDir = masterDir.resolve(name).toFile
+        )
+      }
 
   def publish(): Unit = {
     try {
@@ -89,7 +94,7 @@ case class Documenter(
   }
 
 
-  protected[publish] def createScaladocFor(subProject: SubProject): Unit = {
+  protected[publish] def createScaladocFor(implicit subProject: SubProject): Unit = {
     log.info(s"Creating Scaladoc for ${ subProject.name }.")
 
     val outputDirectory: Path = ghPages.apiDirFor(subProject)
@@ -108,11 +113,11 @@ case class Documenter(
       externalDoc = "", // todo figure this out
       footer = config.copyright,
       outputDirectory = outputDirectory,
-      sourcePath = new File(subProject.baseDirectory, "src/main/scala").getAbsolutePath,
+      sourcePath = subProject.srcDir.getAbsolutePath,
       sourceUrl = sourceUrl,
       title = name,
       version = version
-    ).run(subProject.baseDirectory, commandLine)
+    ).run(subProject.apiDir, commandLine)
     ()
   }
 
