@@ -34,11 +34,11 @@ class CommandLine(implicit config: Config = Config.default) {
 
   var lastResult = ""
 
-  protected val cmdNameCache =
+  protected val cmdNameCache: mutable.Map[String, Path] =
     mutable.HashMap(
-      "git"      -> which("git", useCache=false),
-      "sbt"      -> which("sbt", useCache=false),
-      "scaladoc" -> which("scaladoc", useCache=false)
+      "git"      -> whichOrThrow("git", useCache=false),
+      "sbt"      -> whichOrThrow("sbt", useCache=false),
+      "scaladoc" -> whichOrThrow("scaladoc", useCache=false)
     )
 
 
@@ -99,8 +99,8 @@ class CommandLine(implicit config: Config = Config.default) {
       .map(Paths.get(_))
 
   def which(programName: String, useCache: Boolean = true): Option[Path] =
-    (if (useCache) cmdNameCache(programName) else None) orElse {
-      val result = paths.collectFirst {
+    (if (useCache) cmdNameCache.get(programName) else None) orElse {
+      val result: Option[Path] = paths.collectFirst {
         case path if resolve(path, programName).exists(_.toFile.exists)                  => resolve(path, programName)
 
         case path if isWin && resolve(path, s"$programName.cmd").exists(_.toFile.exists) => resolve(path, s"$programName.cmd")
@@ -108,7 +108,7 @@ class CommandLine(implicit config: Config = Config.default) {
         case path if isWin && resolve(path, s"$programName.bat").exists(_.toFile.exists) => resolve(path, s"$programName.bat")
       }.flatten
 
-      if (useCache) cmdNameCache.put(programName, result)
+      if (useCache) result.foreach(cmdNameCache.put(programName, _))
       result
     }
 
@@ -118,8 +118,8 @@ class CommandLine(implicit config: Config = Config.default) {
     if (x.toFile.exists) Some(x) else None
   }
 
-  @inline protected def whichOrThrow(program: String): Path =
-    which(program) match {
+  @inline protected def whichOrThrow(program: String, useCache: Boolean = true): Path =
+    which(program, useCache) match {
       case None =>
         Console.err.println(s"Error: $program not found on ${ if (isWin) "Path" else "PATH" }")
         System.exit(0)

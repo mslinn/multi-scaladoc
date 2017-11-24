@@ -54,9 +54,11 @@ case class Scaladoc(
   def run(cwd: File, commandLine: CommandLine): String = {
     outputDirectory.toFile.mkdirs()
 
-    val dotIsInstalled = commandLine.which("dot").nonEmpty
+    val dotIsInstalled = commandLine.which("dot").isDefined
     if (diagrams && !dotIsInstalled)
-      log.warn("Inheritance diagrams were requested, but the 'dot' program from the 'graphviz' package is not installed.")
+      log.warn("""Inheritance diagrams were requested, but the 'dot' program from the 'graphviz' package is not installed.
+                 |Please see http://www.graphviz.org/Download.php
+                 |""".stripMargin)
 
     val options =
       option("-classpath",        classPath) :::

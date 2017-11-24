@@ -125,24 +125,23 @@ case class Documenter(
   }
 
   protected def writeIndex(preserveIndex: Boolean = false): Unit = {
-    val ghFile = ghPages.root.toFile
-    if (!preserveIndex || ghFile.list.isEmpty) {
-      val index: File = new File(ghFile, "index.html")
+    val indexHtml: File = new File(ghPages.root.toFile, "index.html")
+    if (!preserveIndex || !indexHtml.exists) {
       val contents: String = subProjects.map { subProject =>
         s"<a href='api/latest/${ subProject.name }/index.html' class='extype'><code>${ subProject.name }</code></a><br/>"
       }.mkString("<p>", "\n", "</p>")
 
-      FileUtils.write(index,
+      FileUtils.write(indexHtml,
         s"""
-           |<!DOCTYPE html >
+           |<!DOCTYPE html>
            |<html>
            |<head>
            |  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
            |  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
            |  <title>$name v$version API</title>
            |  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-           |  <link href="lib/index.css" media="screen" type="text/css" rel="stylesheet" />
-           |  <link href="lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+           |  <link href="https://www.scala-lang.org/api/current/lib/index.css" media="screen" type="text/css" rel="stylesheet" />
+           |  <link href="https://www.scala-lang.org/api/current/lib/template.css" media="screen" type="text/css" rel="stylesheet" />
            |</head>
            |<body>
            |<div id="content-scroll-container" style="-webkit-overflow-scrolling: touch;">
