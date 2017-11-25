@@ -71,7 +71,7 @@ case class Scaladoc(
       option("-doc-title",        title) :::
       option("-doc-version",      version) :::
       option("-implicits",        implicits) :::
-      option("-sourcepath",       sourcePath) :::
+      option("-sourcepath",       sourcePath) ::: // todo this seems to have no effect
       option("-verbose",          verbose)
 
     val sourceFiles: List[String] = scalaFilesUnder(subProject.srcDir)
@@ -91,6 +91,7 @@ case class Scaladoc(
     listFiles(sourcePath, Array("scala"), true)
       .asScala
       .toList
-      .map(x => sourcePath.toPath.relativize(x.toPath).toString)
+      .map(_.getPath)
+      //.map(x => sourcePath.toPath.relativize(x.toPath).toString)
   }
 }
