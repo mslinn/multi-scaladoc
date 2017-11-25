@@ -22,7 +22,7 @@ For example, if your GitHub user id is `mslinn` and your project is called `web3
 Note that [GitHub pages do not support SSL certificates for custom subdomains](https://github.com/isaacs/github/issues/156).
 
 ## Scaladoc Output Features
-This program takes advantage of several important Scaladoc features that are not used by default:
+This program takes advantage of several important Scaladoc features that are not provided by default when you run `sbt doc`:
 
 1. Links well-known Scala types to other online Scaladoc.
 2. Creates inheritance diagrams.
