@@ -41,6 +41,20 @@ class CommandLine(implicit config: Config = Config.default) {
       "scaladoc" -> whichOrThrow("scaladoc", useCache=false)
     )
 
+  /** Change current directory
+    * @return Current directory */
+  @inline def cd(dir: File): File = {
+    System.setProperty("user.dir", dir.getPath)
+    new File(sys.props("user.dir"))
+  }
+
+  /** Change current directory
+    * @return Current directory */
+  @inline def cd(dir: Path): Path = cd(dir.toFile).toPath
+
+  /** Change current directory
+    * @return Current directory */
+  @inline def cd(dir: String): String = cd(new File(dir)).getPath
 
   @inline def run(cmd: String)
                  (implicit logMessage: LogMessage, log: Logger): String =

@@ -172,6 +172,7 @@ case class Documenter(
            |  <div id="content-container" style="-webkit-overflow-scrolling: touch;">
            |    <h1 class='signature' id='signature'><span class='symbol'>$name</span> v$version Sub-Projects</h1>
            |	<div id='content'>
+           |   <h2><a href='https://www.github.com/${ config.gitHubName }/$name'>GitHub Project</a></h2>
            | 		<ul class='symbol'>
            |$contents
            |		</ul>
