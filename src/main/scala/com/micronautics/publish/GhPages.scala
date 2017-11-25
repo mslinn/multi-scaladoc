@@ -1,5 +1,7 @@
 package com.micronautics.publish
 
+import java.io.File
+import java.nio.charset.Charset
 import java.nio.file.Path
 import com.micronautics.publish.Documenter.log
 import org.apache.commons.io.FileUtils
@@ -65,6 +67,24 @@ case class GhPages(
 
     // Create the gh-pages branch and push it
     run(root, "git", "commit", "--allow-empty", "-m", s"Initialize $ghPagesBranchName branch")
+    FileUtils.write(new File(".gitignore"), s""".classpath
+                                               |*.sublime-*
+                                               |*~
+                                               |.cache
+                                               |.idea/
+                                               |.idea_modules/
+                                               |.project
+                                               |.history
+                                               |.settings/
+                                               |*.iml
+                                               |*.stackdump
+                                               |*.zip
+                                               |abi/
+                                               |abiWrapper/
+                                               |lib/
+                                               |logs/
+                                               |target/
+                                               | """.stripMargin, Charset.forName("UTF-8"))
     run(root, "git", "push", "origin", ghPagesBranchName)
 
     Nuke.remove(root) // All done
