@@ -13,5 +13,6 @@
 *.zip
 #abi/
 #abiWrapper/
+lib/
 logs/
 target/
