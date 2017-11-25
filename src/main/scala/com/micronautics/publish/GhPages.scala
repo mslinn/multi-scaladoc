@@ -81,7 +81,6 @@ case class GhPages(
                                                |*.zip
                                                |abi/
                                                |abiWrapper/
-                                               |lib/
                                                |logs/
                                                |target/
                                                | """.stripMargin, Charset.forName("UTF-8"))
