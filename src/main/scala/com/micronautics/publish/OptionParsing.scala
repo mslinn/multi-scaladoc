@@ -46,6 +46,7 @@ trait OptionParsing {
     opt[String]('n', "gitHubName").action { (value, config) =>
       config.copy(gitHubName = Some(value))
     }.text(wrap(s"Github project ID for project to be documented. ${ overrides("SCALADOC_GITHUB_NAME") }"))
+     .withFallback(() => sys.env.getOrElse("SCALADOC_GITHUB_NAME", die()))
      .required
 
     opt[Unit]('p', "preserveIndex").action { (value, config) =>
@@ -63,11 +64,13 @@ trait OptionParsing {
     opt[String]('s', "subProjectNames").action { (value, config) =>
       config.copy(subProjectNames = value.split(",").toList)
     }.text(wrap(s"Comma-delimited names of subprojects to generate Scaladoc for. ${ overrides("SCALADOC_SUB_PROJECT_NAMES") }"))
+      .withFallback(() => sys.env.getOrElse("SCALADOC_SUB_PROJECT_NAMES", die()))
       .required
 
     opt[String]('u', "gitRemoteOriginUrl").action { (value, config) =>
       config.copy(gitRemoteOriginUrl = Some(value))
     }.text(wrap(s"Github project url for project to be documented. ${ overrides("SCALADOC_GIT_URL") }"))
+      .withFallback(() => sys.env.getOrElse("SCALADOC_GIT_URL", die()))
       .required
   }
 
