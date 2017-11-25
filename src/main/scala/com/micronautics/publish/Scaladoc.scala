@@ -79,7 +79,7 @@ case class Scaladoc(
     commandLine.run(cwd, command: _*)
   }
 
-  /** @return relativized list of scala file names under `sourcePath`, including `sourcePath`; filters out any files in `sourcePath/test` */
+  /** @return relativized list of scala file names under `sourcePath`, including `sourcePath`; filters out any files in `sourcePath/src/test` */
   def scalaFilesUnder(sourcePath: File): List[String] = {
     import scala.collection.JavaConverters._
     import org.apache.commons.io.FileUtils.listFiles
@@ -88,6 +88,7 @@ case class Scaladoc(
       Console.err.println(s"Error: $sourcePath does not exist.")
       System.exit(-1)
     }
+    log.debug(s"listing files in $sourcePath, ignoring those in ")
     /*val allSrcFiles = */listFiles(sourcePath, Array("scala"), true)
       .asScala
       .filterNot(_.getPath.startsWith(s"$sourcePath/src/test"))
