@@ -1,0 +1,7 @@
+import org.apache.commons.io.FileUtils._
+import scala.collection.JavaConverters._
+import java.io.File
+val sourcePath: File = new File("src")
+val allSrcFiles = listFiles(sourcePath, Array("scala"), true).asScala.toList
+val testFiles = listFiles(sourcePath.toPath.resolve("test").toFile, Array("scala"), true).asScala.toList
+(allSrcFiles diff testFiles).map(_.getPath)
