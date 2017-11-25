@@ -92,6 +92,7 @@ case class Scaladoc(
     /*val allSrcFiles = */listFiles(sourcePath, Array("scala"), true)
       .asScala
       .filterNot(_.getPath.startsWith(s"$sourcePath/src/test"))
+      .map(_.getPath)
       .toList
      //.map(x => sourcePath.toPath.relativize(x.toPath).toString)
   }
