@@ -153,7 +153,7 @@ case class Documenter(
     val indexHtml: File = new File(ghPages.root.toFile, "index.html")
     if (!preserveIndex || !indexHtml.exists) {
       val contents: String = subProjects.map { subProject =>
-        s"        <li><a href='api/latest/${ subProject.name }/index.html'>root</a><br/></li>"
+        s"        <li><a href='$name/latest/api/${ subProject.name }/index.html'>${ subProject.name }</a><br/></li>"
       }.mkString("\n")
 
       FileUtils.write(indexHtml,
