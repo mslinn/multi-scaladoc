@@ -88,16 +88,10 @@ case class Scaladoc(
       Console.err.println(s"Error: $sourcePath does not exist.")
       System.exit(-1)
     }
-    val allSrcFiles = listFiles(sourcePath, Array("scala"), true)
+    /*val allSrcFiles = */listFiles(sourcePath, Array("scala"), true)
       .asScala
+      .filterNot(_.getPath.startsWith(s"$sourcePath/src/test"))
       .toList
-
-      val testFiles = listFiles(sourcePath.toPath.resolve("test").toFile, Array("scala"), true)
-        .asScala
-        .toList
-
-    (allSrcFiles diff testFiles)
-      .map(_.getPath)
-      //.map(x => sourcePath.toPath.relativize(x.toPath).toString)
+     //.map(x => sourcePath.toPath.relativize(x.toPath).toString)
   }
 }
