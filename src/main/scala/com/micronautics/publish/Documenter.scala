@@ -153,29 +153,29 @@ case class Documenter(
     val indexHtml: File = new File(ghPages.root.toFile, "index.html")
     if (!preserveIndex || !indexHtml.exists) {
       val contents: String = subProjects.map { subProject =>
-        s"<a href='api/latest/${ subProject.name }/index.html' class='extype'><code>${ subProject.name }</code></a><br/>"
-      }.mkString("<p>", "\n", "</p>")
+        s"        <li><a href='api/latest/${ subProject.name }/index.html'>root</a><br/></li>"
+      }.mkString("\n")
 
       FileUtils.write(indexHtml,
-        s"""
-           |<!DOCTYPE html>
+        s"""<!DOCTYPE html>
            |<html>
            |<head>
            |  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
            |  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
            |  <title>$name v$version API</title>
            |  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-           |  <link href="https://www.scala-lang.org/api/current/lib/index.css" media="screen" type="text/css" rel="stylesheet" />
-           |  <link href="https://www.scala-lang.org/api/current/lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+           |  <link href="https://www.scala-lang.org/api/current/lib/index.css" type="text/css" rel="stylesheet" />
+           |  <link href="https://www.scala-lang.org/api/current/lib/template.css" type="text/css" rel="stylesheet" />
            |</head>
            |<body>
            |<div id="content-scroll-container" style="-webkit-overflow-scrolling: touch;">
            |  <div id="content-container" style="-webkit-overflow-scrolling: touch;">
-           |    <div id="subpackage-spacer">
-           |      <div id="packages">
-           |        $contents
-           |      </div>
-           |    </div>
+           |    <h1 class='signature' id='signature'><span class='symbol'>$name</span> v$version Sub-Projects</h1>
+           |	<div id='content'>
+           | 		<ul class='symbol'>
+           |$contents
+           |		</ul>
+           | 	</div>
            |  </div>
            |</div>
            |</body>
