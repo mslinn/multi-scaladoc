@@ -3,23 +3,13 @@ package com.micronautics.publish
 import java.io.File
 import java.nio.charset.Charset
 import java.nio.file.{Files, Path}
-import java.util.UUID
 import org.apache.commons.io.FileUtils
 import org.slf4j.event.Level._
-import FSMLike._
-import scala.collection.JavaConverters._
 
 object Documenter {
   implicit val log: org.slf4j.Logger = org.slf4j.LoggerFactory.getLogger("pub")
 
   val rootDir: Path = Documenter.temporaryDirectory
-
-  val states: Map[UUID, FSMLike[_]] =
-    List(
-      (stop.id, stop)
-    ).toMap
-
-  lazy val fsm = FiniteStateMachine(states)
 
 
   @inline def file(name: String): File = new File(name)

@@ -26,6 +26,7 @@ case class GitStatistics(subProject: SubProject) {
   def userCommitTotals(implicit commandLine: CommandLine): List[(Int, String)] = {
     import commandLine.cd
     cd(subProject.srcDir)
+    // Is this better? git shortlog -sn --no-merges
     val lines: Array[String] = "git shortlog -sn".!!
       .trim
       .split("\n")

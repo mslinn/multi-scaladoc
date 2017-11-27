@@ -2,6 +2,77 @@ package com.micronautics.publish
 
 import java.io.File
 import java.nio.file.{Path, Paths}
+import org.apache.commons.io.FileUtils
+import scala.collection.mutable
+
+/** @see See [[https://stackoverflow.com/a/31322970/553865 How to link classes from JDK into scaladoc-generated doc?]] */
+object Scaladoc {
+  import scala.util.matching.Regex
+  import java.nio.charset.Charset
+  import scala.util.matching.Regex.Match
+
+  lazy val Array(javaVerPrefix, javaVerMajor, javaVerMinor, _, _) =
+    System.getProperty("java.runtime.version").split("\\.|_|-b")
+
+  lazy val javaApiUrl: String = s"https://docs.oracle.com/javase/$javaVerMajor/docs/api/index.html"
+
+  lazy val externalJavadocMap: mutable.Map[String, String] = mutable.Map(
+    "owlapi" -> "http://owlcs.github.io/owlapi/apidocs_4_0_2/index.html"
+  )
+
+  lazy val fixJavaLinks: Match => String =
+    m => m.group(1) + "?" + m.group(2).replace(".", "/") + ".html"
+
+  lazy val allExternalJavadocLinks: Seq[String] = javaApiUrl +: externalJavadocMap.values.toSeq
+
+  /** `rt.jar` is located in the path stored in the `sun.boot.class.path` system property.
+   * @see See [[https://docs.oracle.com/javase/8/docs/technotes/tools/findingclasses.html the Oracle documentation]]. */
+  lazy val rtJar: String =
+    System
+      .getProperty("sun.boot.class.path")
+      .split(File.pathSeparator)
+      .collectFirst {
+        case str: String if str.endsWith(File.separator + "rt.jar") => str
+      }.get // fail hard if not found
+
+  lazy val utf8: Charset = Charset.forName("UTF-8")
+
+  /** Fix Java links - replace `#java.io.File` with `?java/io/File.html` */
+  def fixJavaDocLinks(target: File, classpath: List[String]): Unit = {
+    import scala.collection.JavaConverters._
+    import java.net.URL
+
+    // Look up the path to the jar with the given prefix from the classpath
+    def findJar(namePrefix: String): File =
+      classpath.find { _.matches(s"$namePrefix*.jar") }.map(new File(_)).get
+
+    /** External documentation paths */
+    // todo should this info be somehow used when creating scaladoc?
+    val enhancedMap: mutable.Map[File, URL] =
+      externalJavadocMap.map {
+        case (name, javadocURL) => findJar(name) -> new URL(javadocURL)
+      } + (new File(rtJar) -> new URL(javaApiUrl))
+
+    // Patch the links to JavaDoc in the generated Scaladoc
+    FileUtils
+      .listFiles(target, Array("html"), true)
+      .asScala
+      .filter(hasJavadocLink).foreach { file =>
+        val newContent: String = allExternalJavadocLinks.foldLeft(FileUtils.readFileToString(file, utf8)) {
+          case (oldContent: String, javadocUrl: String) =>
+            javadocLinkRegex(javadocUrl).replaceAllIn(oldContent, fixJavaLinks)
+        }
+        FileUtils.write(file, newContent, utf8)
+      }
+  }
+
+  def hasJavadocLink(f: File): Boolean = allExternalJavadocLinks exists {
+    javadocUrl: String =>
+      (javadocLinkRegex(javadocUrl) findFirstIn FileUtils.readFileToString(f, utf8)).nonEmpty
+  }
+
+  def javadocLinkRegex(javadocURL: String): Regex = ("""\"(\Q""" + javadocURL + """\E)#([^"]*)\"""").r
+}
 
 /** @param classPath Specify where to find user class files (on Unix-based systems a colon-separated list of paths, on Windows-based systems, a semicolon-separate list  of
   *            paths). This does not override the built-in ("boot") search path.
@@ -15,6 +86,7 @@ import java.nio.file.{Path, Paths}
   *           Executing the following code in the Scala interpreter will return the default value on your system:
   *           {{{new java.io.InputStreamReader(System.in).getEncoding}}}
   * @param externalDoc Comma-separated list of classpath_entry_path#doc_URL pairs describing external dependencies.
+  *                    Example: `-doc-external-doc:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/rt.jar#http://docs.oracle.com/javase/8/docs/api/`
   * @param footer  A footer on every Scaladoc page, by default set to non-blank space. Can be overridden with a custom footer.
   * @param implicits Document members inherited by implicit conversions.
   * @param sourcePath Location(s) of source files.
