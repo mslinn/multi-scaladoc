@@ -1,7 +1,7 @@
 # Scaladoc for SBT MultiProjects
 
-[![Build Status](https://travis-ci.org/mslinn/scaladoc.svg?branch=master)](https://travis-ci.org/mslinn/scaladoc)
-[![GitHub version](https://badge.fury.io/gh/mslinn%2Fscaladoc.svg)](https://badge.fury.io/gh/mslinn%2Fscaladoc)
+[![Build Status](https://travis-ci.org/mslinn/multi-scaladoc.svg?branch=master)](https://travis-ci.org/mslinn/multi-scaladoc)
+[![GitHub version](https://badge.fury.io/gh/mslinn%2Fmulti-scaladoc.svg)](https://badge.fury.io/gh/mslinn%2Fmulti-scaladoc)
 [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 
 This program creates Scaladoc for SBT multi-projects hosted on GitHub.
@@ -82,10 +82,10 @@ Create and proofread the Scaladoc output for the SBT project you wish to documen
 
 ## Running this Program
 1. Check it out to another directory.
-   In this example, this program is cloned into `~/scaladoc`:
+   In this example, this program is cloned into `~/multi-scaladoc`:
    ```
-   $ git clone https://github.com/mslinn/scaladoc.git ~/scaladoc
-   $ cd ~/scaladoc
+   $ git clone https://github.com/mslinn/multi-scaladoc.git ~/multi-scaladoc
+   $ cd ~/multi-scaladoc
    ```
 2. Edit the settings in the `bin/run` script:
    ```
