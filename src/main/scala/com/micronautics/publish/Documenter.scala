@@ -148,7 +148,7 @@ case class Documenter(
     val indexHtml: File = new File(ghPages.root.toFile, "index.html")
     if (!preserveIndex || !indexHtml.exists) {
       val contents: String = subProjects.map { subProject =>
-        s"        <li><a href='latest/api/${ subProject.name }/index.html'>${ subProject.name }</a><br/></li>"
+        s"        <li style='margin-left: 1em; line-height: 2em;'><a href='latest/api/${ subProject.name }/index.html'>${ subProject.name }</a><br/></li>"
       }.mkString("\n")
 
       FileUtils.write(indexHtml,
@@ -157,7 +157,7 @@ case class Documenter(
            |<head>
            |  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
            |  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-           |  <title>$name v$version API</title>
+           |  <title>$name v$version APIs</title>
            |  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
            |  <link href="https://www.scala-lang.org/api/current/lib/index.css" type="text/css" rel="stylesheet" />
            |  <link href="https://www.scala-lang.org/api/current/lib/template.css" type="text/css" rel="stylesheet" />
@@ -165,13 +165,13 @@ case class Documenter(
            |<body>
            |<div id="content-scroll-container" style="-webkit-overflow-scrolling: touch;">
            |  <div id="content-container" style="-webkit-overflow-scrolling: touch;">
-           |    <h1 class='signature' id='signature'><span class='symbol'>$name</span> v$version Sub-Projects</h1>
-           |	<div id='content'>
-           |   <h2><a href='https://www.github.com/${ config.gitHubName.mkString }/$name'>GitHub Project</a></h2>
-           | 		<ul class='symbol'>
+           |    <h1 class='signature' id='signature'><span class='symbol'><a href='https://www.github.com/${ config.gitHubName.mkString }/$name'>$name</a></span> v$version APIs</h1>
+           |	  <div id='content'>
+           |     <p>Not all <code>$name</code> subprojects may be documented. Documented subprojects are:</p>
+           | 	  	<ul class='symbol'>
            |$contents
-           |		</ul>
-           | 	</div>
+           |	  	</ul>
+           | 	  </div>
            |  </div>
            |</div>
            |</body>
