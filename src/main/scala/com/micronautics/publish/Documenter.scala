@@ -49,8 +49,12 @@ case class Documenter(
   lazy val version: String =
     run(masterDir, "sbt", "-no-colors", "show version")
       .split("\n")
+      .map(_.trim)
+      .filter(_.nonEmpty)
       .last
       .split(" ")
+      .map(_.trim)
+      .filter(_.nonEmpty)
       .last
 
   // Subprojects to document; other subprojects are ignored
