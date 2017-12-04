@@ -28,6 +28,7 @@ case class Documenter(
   import com.micronautics.publish.Documenter._
   import commandLine.run
 
+  /* Get a fresh copy of the project to be documented */
   config.gitRemoteOriginUrl.map { url =>
    run(root, "git", "clone", "--depth", "1", url, "master")
   }.getOrElse {
