@@ -21,7 +21,7 @@ object Config {
   * @param preserveIndex Preserve any pre-existing index.html file in the Scaladoc root
   * @param subProjectNames Names of subprojects to generate Scaladoc for; delimited by commas */
 case class Config(
-  copyright: String = "&nbsp;",
+  copyright: String = "",
   dryRun: Boolean = false,
   gitHubName: Option[String] = None,
   gitRemoteOriginUrl: Option[String] = None,
