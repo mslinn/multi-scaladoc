@@ -51,7 +51,7 @@ logLevel in compile := Level.Warn
 // Level.INFO is needed to see detailed output when running tests
 logLevel in test := Level.Info
 
-name := "scaladoc"
+name := "multi-scaladoc"
 
 organization := "com.micronautics"
 
