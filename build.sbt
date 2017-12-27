@@ -7,7 +7,16 @@ buildInfoPackage := "buildInfo"
 buildInfoKeys ++= Seq[BuildInfoKey]( // assumes that the git repo directory has not been renamed
   "gitRepoName" -> new File(sys.props("user.dir")).getName
 )
+
 cancelable := true
+
+developers := List(
+  Developer("mslinn",
+            "Mike Slinn",
+            "mslinn@micronauticsresearch.com",
+            url("https://github.com/mslinn")
+  )
+)
 
 // See https://stackoverflow.com/a/27858890/553865
 evictionWarningOptions in update :=
@@ -111,6 +120,13 @@ scalacOptions ++= Seq( // From https://tpolecat.github.io/2017/04/25/scalac-flag
 scalacOptions in (Compile, console) --= Seq("-Ywarn-unused:imports", "-Xfatal-warnings")
 
 scalaVersion := "2.12.4"
+
+scmInfo := Some(
+  ScmInfo(
+    url(s"https://github.com/mslinn/$name"),
+    s"git@github.com:mslinn/$name.git"
+  )
+)
 
 trapExit := false
 
