@@ -63,7 +63,7 @@ class TestyMcTestFace extends WordSpec with MustMatchers {
       val cwd = new java.io.File(sys.props("user.dir"))
       val subProjectsFound =
         commandLine
-          .run(cwd, "sbt.bat projects")
+          .run(cwd, "sbt projects")
           .split("In file:")
           .last
           .replace("[info] \t *", "")

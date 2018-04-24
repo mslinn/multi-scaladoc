@@ -119,7 +119,7 @@ scalacOptions ++= Seq( // From https://tpolecat.github.io/2017/04/25/scalac-flag
 // The REPL can’t cope with -Ywarn-unused:imports or -Xfatal-warnings so turn them off for the console
 scalacOptions in (Compile, console) --= Seq("-Ywarn-unused:imports", "-Xfatal-warnings")
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.12.5"
 
 scmInfo := Some(
   ScmInfo(

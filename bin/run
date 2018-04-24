@@ -7,7 +7,7 @@ export SCALADOC_GITHUB_NAME="mslinn"           # replace this with your github u
 export SCALADOC_KEEP="true"                    # comment this out for production
 #export SCALADOC_PRESERVE_INDEX="true"
 export SCALADOC_GIT_URL="git@github.com:mslinn/web3j-scala.git"  # Edit this to point to the SBT project on GitHub that you want to document
-export SCALADOC_SUB_PROJECT_NAMES="root,demo"  # Edit this to include the SBT project names that you want to generate Scaladoc for
+export SCALADOC_SUB_PROJECT_NAMES="web3j-scala,demo"  # Edit this to include the SBT project names that you want to generate Scaladoc for
 # No need to modify anything below this line
 
 

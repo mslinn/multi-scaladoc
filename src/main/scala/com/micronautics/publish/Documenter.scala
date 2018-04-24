@@ -75,7 +75,7 @@ case class Documenter(
                |Gathering the list of available SBT subprojects in project $name...
                |""".stripMargin)
             val subProjectsFound =
-              run(masterDir, "sbt.bat projects")
+              run(masterDir, "sbt projects")
                 .split("In file:")
                 .last
                 .replace("[info] \t *", "")
